@@ -13,12 +13,10 @@ import net.sf.robocode.io.Logger;
 import robocode.control.events.*;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.robotinterfaces.IBasicRobot;
-import robocode.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 
 import static robocode.util.Utils.isNear;
 
@@ -224,6 +222,10 @@ public abstract class RobotTestBed<R extends IBasicRobot> extends BattleAdaptor 
         return true;
     }
 
+    public boolean isEnableRecording() {
+        return false;
+    }
+
     /**
      * The setup method run before each test, which sets up the listener on the engine for testing.
      * Don't override this method; instead, override runSetup to add behavior before the test
@@ -273,7 +275,7 @@ public abstract class RobotTestBed<R extends IBasicRobot> extends BattleAdaptor 
             assertNotNull("Robot were not loaded", robotSpecifications);
             assertEquals("Robot were not loaded", getExpectedRobotCount(robotList), robotSpecifications.length);
             engine.runBattle(new BattleSpecification(numRounds, battleFieldSpec, robotSpecifications), initialPositions,
-                    true);
+                    true, isEnableRecording());
         }
     }
 
