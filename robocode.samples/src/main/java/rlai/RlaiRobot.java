@@ -47,22 +47,26 @@ public class RlaiRobot extends Robot {
         while (_runThread) {
 
             Map action_response = _gson.fromJson(getAction(), Map.class);
-            String action_name = (String) action_response.get("action");
-            double action_value = (double) action_response.get("value");
 
-            switch (action_name) {
-                case "fire":
-                    fire(action_value);
-                    break;
-                case "ahead":
-                    ahead(action_value);
-                    break;
-                case "back":
-                    back(action_value);
-                    break;
+            try {
+                String action_name = (String) action_response.get("action");
+                double action_value = (double) action_response.get("value");
+
+                switch (action_name) {
+                    case "fire":
+                        fire(action_value);
+                        break;
+                    case "ahead":
+                        ahead(action_value);
+                        break;
+                    case "back":
+                        back(action_value);
+                        break;
+                }
             }
-
-            setState();
+            finally {
+                setState();
+            }
         }
     }
 
