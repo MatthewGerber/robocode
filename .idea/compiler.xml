@@ -17,6 +17,7 @@
       <module name="robocode.tests.robots" target="1.8" />
       <module name="robocode.ui" target="1.8" />
       <module name="robocode.ui.editor" target="1.8" />
+      <module name="test_robot" target="15" />
     </bytecodeTargetLevel>
   </component>
 </project>

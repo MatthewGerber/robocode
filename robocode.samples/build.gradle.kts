@@ -5,6 +5,8 @@ plugins {
 
 dependencies {
     implementation(project(":robocode.api"))
+    implementation("org.glassfish.jersey.containers:jersey-container-servlet:2.25.1")
+    implementation(group = "com.google.code.gson", name = "gson", version = "2.8.6")
 }
 
 description = "Robocode Samples"
