@@ -3,24 +3,32 @@ package rlai;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.glassfish.jersey.client.ClientConfig;
-import robocode.*;
+import robocode.DeathEvent;
+import robocode.Robot;
+import robocode.RoundEndedEvent;
+import robocode.ScannedRobotEvent;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Robot that interfaces with the rlai REST server.
+ */
 public class RlaiRobot extends Robot {
 
-    private HashMap<String, Object> _state;
+    private final HashMap<String, Object> _state;
     private boolean _runThread;
-
-    private Gson _gson;
-    private WebTarget _target;
+    private final Gson _gson;
+    private final Invocation.Builder _resetInvocationBuilder;
+    private final Invocation.Builder _getActionInvocationBuilder;
+    private final Invocation.Builder _setStateInvocationBuilder;
 
     public RlaiRobot() {
 
@@ -30,14 +38,28 @@ public class RlaiRobot extends Robot {
         _state.put("scanned_robot_event", null);
         _state.put("dead", false);
         _state.put("win", false);
-
         _runThread = false;
-
         _gson = new GsonBuilder().serializeNulls().create();
 
+        // initialize rest invocation builders
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
-        _target = client.target(UriBuilder.fromUri("http://127.0.0.1:12345").build());
+        URI rlaiRestHost = UriBuilder.fromUri("http://127.0.0.1:12345").build();
+
+        _resetInvocationBuilder = client.target(rlaiRestHost).
+                path("reset-for-new-run").
+                request().
+                accept(MediaType.APPLICATION_JSON);
+
+        _getActionInvocationBuilder = client.target(rlaiRestHost).
+                path("get-action").
+                request().
+                accept(MediaType.APPLICATION_JSON);
+
+        _setStateInvocationBuilder = client.target(rlaiRestHost).
+                path("set-state").
+                request().
+                accept(MediaType.APPLICATION_JSON);
     }
 
     public void run() {
@@ -46,11 +68,12 @@ public class RlaiRobot extends Robot {
 
         while (_runThread) {
 
-            Map action_response = _gson.fromJson(getAction(), Map.class);
+            Map<String, Object> action = getAction();
 
             try {
-                String action_name = (String) action_response.get("action");
-                double action_value = (double) action_response.get("value");
+
+                String action_name = (String) action.get("name");
+                double action_value = (double) action.get("value");
 
                 switch (action_name) {
                     case "fire":
@@ -81,10 +104,7 @@ public class RlaiRobot extends Robot {
         String state_json = _gson.toJson(_state);
         Entity<String> state_entity = Entity.json(state_json);
 
-        _target.path("reset-for-new-run").
-                request().
-                accept(MediaType.APPLICATION_JSON).
-                put(state_entity);
+        _resetInvocationBuilder.put(state_entity, String.class);
     }
 
     private void setState() {
@@ -94,20 +114,15 @@ public class RlaiRobot extends Robot {
         String payload_json = _gson.toJson(_state);
         Entity<String> state_entity = Entity.json(payload_json);
 
-        _target.path("set-state").
-                request().
-                accept(MediaType.APPLICATION_JSON).
-                put(state_entity);
+        _setStateInvocationBuilder.put(state_entity, String.class);
     }
 
-    private String getAction() {
+    private Map<String, Object> getAction() {
 
-        String response = _target.path("get-action").
-                request().
-                accept(MediaType.APPLICATION_JSON).
-                get(String.class);
+        String actionResponseJSON = _getActionInvocationBuilder.get(String.class);
+        Map<String, Map<String, Object>> actionResponseMap = _gson.fromJson(actionResponseJSON, Map.class);
+        return actionResponseMap.get("action");
 
-        return response;
     }
 
     private void updateState() {
@@ -133,7 +148,6 @@ public class RlaiRobot extends Robot {
 
         boolean win = !(boolean)_state.get("dead");
         _state.put("win", win);
-
         _runThread = false;
     }
 }
