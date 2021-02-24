@@ -17,19 +17,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Robot that interfaces with the rlai REST server.
+ * Wrapper for Robocode events that includes the event type for serialization via gson.
+ */
+class EventWrapper {
+
+    public Event event;
+    public String type;
+
+    public EventWrapper(Event event) {
+        this.event = event;
+        this.type = event.getClass().getSimpleName();
+    }
+}
+
+/**
+ * Robot that interfaces with the RLAI REST server.
  */
 public class RlaiRobot extends Robot {
 
+    private boolean _exitThread;
     private final HashMap<String, Object> _state;
-    private final ArrayList<Event> _events;
+    private final ArrayList<EventWrapper> _events;
     private final Gson _gson;
     private final Invocation.Builder _resetInvocationBuilder;
     private final Invocation.Builder _getActionInvocationBuilder;
     private final Invocation.Builder _setStateInvocationBuilder;
 
+    /**
+     * Constructor
+     */
     public RlaiRobot() {
-        
+
+        _exitThread = false;
         _state = new HashMap<>();
         _events = new ArrayList<>();
         _gson = new GsonBuilder().serializeNulls().create();
@@ -55,18 +74,20 @@ public class RlaiRobot extends Robot {
                 accept(MediaType.APPLICATION_JSON);
     }
 
+    /**
+     * Thread target. Runs the robot by obtaining actions from the RLAI REST server and sending state information back.
+     */
     public void run() {
 
         resetForNewRun();
 
-        boolean exitThread = false;
-
-        while (!exitThread) {
+        while (!_exitThread) {
 
             Map<String, Object> action = getAction();
 
             try {
 
+                // get and execute the next action
                 String action_name = (String) action.get("name");
                 double action_value = (double) action.get("value");
 
@@ -83,40 +104,70 @@ public class RlaiRobot extends Robot {
                 }
             }
 
-            // ensure that the server always receives the state for the action, even if we threw an exception while
-            // executing the action (e.g., due to being killed). the server is blocking waiting for it and will enter
-            // an invalid state if the state is not received.
+            // ensure that the server always receives the state following execution of the action, even if we threw an
+            // exception while executing the action (e.g., due to being killed). the server is blocking waiting for the
+            // state update and will lock up if the state is not received.
             finally {
                 setState();
             }
+        }
 
-            // if the round ended then exit the thread
-            if (_state.get("round_ended_event") != null) {
-                exitThread = true;
-            }
+        // race condition:  if a terminal condition is encountered (robot death or win) just after the setState call
+        // above, then we might potentially not send the terminal condition to the server, locking it up. send a final
+        // state message to ensure that the server terminates the episode.
+        setState();
+    }
+
+    /**
+     * Reset the robot for a new run (round).
+     */
+    private void resetForNewRun() {
+
+        synchronized (_events) {
+
+            _exitThread = false;
+
+            // clear any events before sending the new state to the server
+            _events.clear();
+            Entity<String> payload = getStatePayload();
+            _resetInvocationBuilder.put(payload, String.class);
         }
     }
 
-    private void resetForNewRun() {
-
-        updateState();
-        _events.clear();
-
-        String state_json = _gson.toJson(_state);
-        Entity<String> state_entity = Entity.json(state_json);
-
-        _resetInvocationBuilder.put(state_entity, String.class);
-    }
-
+    /**
+     * Get the next action from the server.
+     *
+     * @return Action dictionary.
+     */
     private Map<String, Object> getAction() {
 
         String actionResponseJSON = _getActionInvocationBuilder.get(String.class);
         Map<String, Map<String, Object>> actionResponseMap = _gson.fromJson(actionResponseJSON, Map.class);
-        return actionResponseMap.get("action");
 
+        return actionResponseMap.get("action");
     }
 
+    /**
+     * Set state at the server.
+     */
     private void setState() {
+
+        synchronized (_events) {
+
+            Entity<String> payload = getStatePayload();
+            _setStateInvocationBuilder.put(payload, String.class);
+
+            // all events were sent to the server. clear them so they don't get sent again.
+            _events.clear();
+        }
+    }
+
+    /**
+     * Get state payload for sending to the server.
+     *
+     * @return Payload entity.
+     */
+    private Entity<String> getStatePayload() {
 
         updateState();
 
@@ -125,14 +176,13 @@ public class RlaiRobot extends Robot {
         payload.put("events", _events);
 
         String payload_json = _gson.toJson(payload);
-        Entity<String> payload_entity = Entity.json(payload_json);
 
-        _setStateInvocationBuilder.put(payload_entity, String.class);
-
-        // all events were sent to the server. clear them so they don't get sent again.
-        _events.clear();
+        return Entity.json(payload_json);
     }
 
+    /**
+     * Update the state map.
+     */
     private void updateState() {
 
         _state.put("battle_field_height", getBattleFieldHeight());
@@ -158,50 +208,76 @@ public class RlaiRobot extends Robot {
     }
 
     public void onBattleEnded(BattleEndedEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onBulletHit(BulletHitEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onBulletHitBullet(BulletHitBulletEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onBulletMissed(BulletMissedEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onDeath(DeathEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+            _exitThread = true;
+        }
     }
 
     public void onHitByBullet(HitByBulletEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onHitRobot(HitRobotEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onHitWall(HitWallEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onRobotDeath(RobotDeathEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onRoundEnded(RoundEndedEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onScannedRobot(ScannedRobotEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+        }
     }
 
     public void onWin(WinEvent event) {
-        _events.add(event);
+        synchronized (_events) {
+            _events.add(new EventWrapper(event));
+            _exitThread = true;
+        }
     }
 }
