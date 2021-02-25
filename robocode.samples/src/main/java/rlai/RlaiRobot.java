@@ -17,27 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Wrapper for Robocode events that includes the event type for serialization via gson.
- */
-class EventWrapper {
-
-    public Event event;
-    public String type;
-
-    public EventWrapper(Event event) {
-        this.event = event;
-        this.type = event.getClass().getSimpleName();
-    }
-}
-
-/**
  * Robot that interfaces with the RLAI REST server.
  */
 public class RlaiRobot extends Robot {
 
     private boolean _exitThread;
     private final HashMap<String, Object> _state;
-    private final ArrayList<EventWrapper> _events;
+    private final HashMap<String, ArrayList<Event>> _events;
     private final Gson _gson;
     private final Invocation.Builder _resetInvocationBuilder;
     private final Invocation.Builder _getActionInvocationBuilder;
@@ -50,7 +36,7 @@ public class RlaiRobot extends Robot {
 
         _exitThread = false;
         _state = new HashMap<>();
-        _events = new ArrayList<>();
+        _events = new HashMap<>();
         _gson = new GsonBuilder().serializeNulls().create();
 
         // initialize rest invocation builders
@@ -88,18 +74,66 @@ public class RlaiRobot extends Robot {
             try {
 
                 // get and execute the next action
-                String action_name = (String) action.get("name");
-                double action_value = (double) action.get("value");
+                String actionName = (String) action.get("name");
+                Object actionValue = action.get("value");
 
-                switch (action_name) {
-                    case "fire":
-                        fire(action_value);
+                switch (actionName) {
+
+                    case "doNothing":
+                        doNothing();
                         break;
+
+                    // robot movement
                     case "ahead":
-                        ahead(action_value);
+                        ahead((double) actionValue);
                         break;
                     case "back":
-                        back(action_value);
+                        back((double) actionValue);
+                        break;
+                    case "turnLeft":
+                        turnLeft((double) actionValue);
+                        break;
+                    case "turnRight":
+                        turnRight((double) actionValue);
+                        break;
+
+                    // radar movement and scanning
+                    case "turnRadarLeft":
+                        turnRadarLeft((double) actionValue);
+                        break;
+                    case "turnRadarRight":
+                        turnRadarRight((double) actionValue);
+                        break;
+                    case "setAdjustRadarForRobotTurn":
+                        setAdjustRadarForRobotTurn((boolean) actionValue);
+                        break;
+                    case "setAdjustRadarForGunTurn":
+                        setAdjustRadarForGunTurn((boolean) actionValue);
+                        break;
+                    case "scan":
+                        scan();
+                        break;
+
+                    // gun movement and firing
+                    case "turnGunLeft":
+                        turnGunLeft((double) actionValue);
+                        break;
+                    case "turnGunRight":
+                        turnGunRight((double) actionValue);
+                        break;
+                    case "setAdjustGunForRobotTurn":
+                        setAdjustGunForRobotTurn((boolean) actionValue);
+                        break;
+                    case "fire":
+                        fire((double) actionValue);
+                        break;
+
+                    // stop/resume
+                    case "stop":
+                        stop((boolean) actionValue);
+                        break;
+                    case "resume":
+                        resume();
                         break;
                 }
             }
@@ -208,76 +242,70 @@ public class RlaiRobot extends Robot {
     }
 
     public void onBattleEnded(BattleEndedEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onBulletHit(BulletHitEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onBulletHitBullet(BulletHitBulletEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onBulletMissed(BulletMissedEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onDeath(DeathEvent event) {
         synchronized (_events) {
-            _events.add(new EventWrapper(event));
+            addEvent(event);
             _exitThread = true;
         }
     }
 
     public void onHitByBullet(HitByBulletEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onHitRobot(HitRobotEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onHitWall(HitWallEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onRobotDeath(RobotDeathEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onRoundEnded(RoundEndedEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onScannedRobot(ScannedRobotEvent event) {
-        synchronized (_events) {
-            _events.add(new EventWrapper(event));
-        }
+        addEvent(event);
     }
 
     public void onWin(WinEvent event) {
         synchronized (_events) {
-            _events.add(new EventWrapper(event));
+            addEvent(event);
             _exitThread = true;
+        }
+    }
+
+    private void addEvent(Event event) {
+        synchronized (_events) {
+            String type = event.getClass().getSimpleName();
+            ArrayList<Event> list;
+            if (_events.containsKey(type)) {
+                list = _events.get(type);
+            } else {
+                list = new ArrayList<>();
+                _events.put(type, list);
+            }
+            list.add(event);
         }
     }
 }
