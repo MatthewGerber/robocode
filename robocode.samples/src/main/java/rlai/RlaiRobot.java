@@ -42,7 +42,7 @@ public class RlaiRobot extends Robot {
         // initialize rest invocation builders
         ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
-        URI rlaiRestHost = UriBuilder.fromUri("http://127.0.0.1:12345").build();
+        URI rlaiRestHost = UriBuilder.fromUri("http://127.0.0.1:54321").build();
 
         _resetInvocationBuilder = client.target(rlaiRestHost).
                 path("reset-for-new-run").
