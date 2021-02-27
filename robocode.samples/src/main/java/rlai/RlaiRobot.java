@@ -8,7 +8,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,11 +20,9 @@ import java.util.Map;
  */
 public class RlaiRobot extends Robot {
 
-    private static Socket _clientSocket;
-    private static PrintWriter _clientWriter;
-    private static BufferedReader _clientReader;
+    private PrintWriter _clientWriter;
+    private BufferedReader _clientReader;
 
-    private boolean _exitThread;
     private final HashMap<String, Object> _state;
     private final HashMap<String, ArrayList<Event>> _events;
     private final Gson _gson;
@@ -31,21 +31,9 @@ public class RlaiRobot extends Robot {
      * Constructor
      */
     public RlaiRobot() {
-
-        _exitThread = false;
         _state = new HashMap<>();
         _events = new HashMap<>();
         _gson = new GsonBuilder().serializeNulls().create();
-
-        if (_clientSocket == null) {
-            try {
-                _clientSocket = new Socket("127.0.0.1", 54321);
-                _clientWriter = new PrintWriter(_clientSocket.getOutputStream(), true);
-                _clientReader = new BufferedReader(new InputStreamReader(_clientSocket.getInputStream()));
-            } catch (Exception ex) {
-                System.out.println("Exception initializing socket:  " + ex);
-            }
-        }
     }
 
     /**
@@ -53,9 +41,14 @@ public class RlaiRobot extends Robot {
      */
     public void run() {
 
-        resetForNewRun();
+        try {
+            resetForNewRun();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
 
-        while (!_exitThread) {
+        while(true) {
 
             // get and execute the next action
             Map<String, Object> action;
@@ -136,14 +129,14 @@ public class RlaiRobot extends Robot {
     /**
      * Reset the robot for a new run (round).
      */
-    private void resetForNewRun() {
+    private void resetForNewRun() throws IOException {
+
+        SocketChannel channel = SocketChannel.open(new InetSocketAddress("127.0.0.1", 54321));
+        Socket socket = channel.socket();
+        _clientWriter = new PrintWriter(socket.getOutputStream(), true);
+        _clientReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         synchronized (_events) {
-
-            _exitThread = false;
-
-            // clear any events before sending the new state to the server
-            _events.clear();
             String payload = getStatePayload();
             _clientWriter.println(payload);
         }
@@ -235,10 +228,7 @@ public class RlaiRobot extends Robot {
     }
 
     public void onDeath(DeathEvent event) {
-        synchronized (_events) {
-            addEvent(event);
-            _exitThread = true;
-        }
+        addEvent(event);
     }
 
     public void onHitByBullet(HitByBulletEvent event) {
@@ -266,10 +256,7 @@ public class RlaiRobot extends Robot {
     }
 
     public void onWin(WinEvent event) {
-        synchronized (_events) {
-            addEvent(event);
-            _exitThread = true;
-        }
+        addEvent(event);
     }
 
     private void addEvent(Event event) {
