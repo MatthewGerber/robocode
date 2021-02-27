@@ -2,16 +2,13 @@ package rlai;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.glassfish.jersey.client.ClientConfig;
 import robocode.*;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,13 +18,14 @@ import java.util.Map;
  */
 public class RlaiRobot extends Robot {
 
+    private static Socket _clientSocket;
+    private static PrintWriter _clientWriter;
+    private static BufferedReader _clientReader;
+
     private boolean _exitThread;
     private final HashMap<String, Object> _state;
     private final HashMap<String, ArrayList<Event>> _events;
     private final Gson _gson;
-    private final Invocation.Builder _resetInvocationBuilder;
-    private final Invocation.Builder _getActionInvocationBuilder;
-    private final Invocation.Builder _setStateInvocationBuilder;
 
     /**
      * Constructor
@@ -39,25 +37,15 @@ public class RlaiRobot extends Robot {
         _events = new HashMap<>();
         _gson = new GsonBuilder().serializeNulls().create();
 
-        // initialize rest invocation builders
-        ClientConfig config = new ClientConfig();
-        Client client = ClientBuilder.newClient(config);
-        URI rlaiRestHost = UriBuilder.fromUri("http://127.0.0.1:54321").build();
-
-        _resetInvocationBuilder = client.target(rlaiRestHost).
-                path("reset-for-new-run").
-                request().
-                accept(MediaType.APPLICATION_JSON);
-
-        _getActionInvocationBuilder = client.target(rlaiRestHost).
-                path("get-action").
-                request().
-                accept(MediaType.APPLICATION_JSON);
-
-        _setStateInvocationBuilder = client.target(rlaiRestHost).
-                path("set-state").
-                request().
-                accept(MediaType.APPLICATION_JSON);
+        if (_clientSocket == null) {
+            try {
+                _clientSocket = new Socket("127.0.0.1", 54321);
+                _clientWriter = new PrintWriter(_clientSocket.getOutputStream(), true);
+                _clientReader = new BufferedReader(new InputStreamReader(_clientSocket.getInputStream()));
+            } catch (Exception ex) {
+                System.out.println("Exception initializing socket:  " + ex);
+            }
+        }
     }
 
     /**
@@ -69,87 +57,80 @@ public class RlaiRobot extends Robot {
 
         while (!_exitThread) {
 
-            Map<String, Object> action = getAction();
-
+            // get and execute the next action
+            Map<String, Object> action;
             try {
-
-                // get and execute the next action
-                String actionName = (String) action.get("name");
-                Object actionValue = action.get("value");
-
-                switch (actionName) {
-
-                    case "doNothing":
-                        doNothing();
-                        break;
-
-                    // robot movement
-                    case "ahead":
-                        ahead((double) actionValue);
-                        break;
-                    case "back":
-                        back((double) actionValue);
-                        break;
-                    case "turnLeft":
-                        turnLeft((double) actionValue);
-                        break;
-                    case "turnRight":
-                        turnRight((double) actionValue);
-                        break;
-
-                    // radar movement and scanning
-                    case "turnRadarLeft":
-                        turnRadarLeft((double) actionValue);
-                        break;
-                    case "turnRadarRight":
-                        turnRadarRight((double) actionValue);
-                        break;
-                    case "setAdjustRadarForRobotTurn":
-                        setAdjustRadarForRobotTurn((boolean) actionValue);
-                        break;
-                    case "setAdjustRadarForGunTurn":
-                        setAdjustRadarForGunTurn((boolean) actionValue);
-                        break;
-                    case "scan":
-                        scan();
-                        break;
-
-                    // gun movement and firing
-                    case "turnGunLeft":
-                        turnGunLeft((double) actionValue);
-                        break;
-                    case "turnGunRight":
-                        turnGunRight((double) actionValue);
-                        break;
-                    case "setAdjustGunForRobotTurn":
-                        setAdjustGunForRobotTurn((boolean) actionValue);
-                        break;
-                    case "fire":
-                        fire((double) actionValue);
-                        break;
-
-                    // stop/resume
-                    case "stop":
-                        stop((boolean) actionValue);
-                        break;
-                    case "resume":
-                        resume();
-                        break;
-                }
+                action = getAction();
+            } catch (IOException e) {
+                e.printStackTrace();
+                break;
             }
 
-            // ensure that the server always receives the state following execution of the action, even if we threw an
-            // exception while executing the action (e.g., due to being killed). the server is blocking waiting for the
-            // state update and will lock up if the state is not received.
-            finally {
-                setState();
+            String actionName = (String) action.get("name");
+            Object actionValue = action.get("value");
+
+            switch (actionName) {
+
+                case "doNothing":
+                    doNothing();
+                    break;
+
+                // robot movement
+                case "ahead":
+                    ahead((double) actionValue);
+                    break;
+                case "back":
+                    back((double) actionValue);
+                    break;
+                case "turnLeft":
+                    turnLeft((double) actionValue);
+                    break;
+                case "turnRight":
+                    turnRight((double) actionValue);
+                    break;
+
+                // radar movement and scanning
+                case "turnRadarLeft":
+                    turnRadarLeft((double) actionValue);
+                    break;
+                case "turnRadarRight":
+                    turnRadarRight((double) actionValue);
+                    break;
+                case "setAdjustRadarForRobotTurn":
+                    setAdjustRadarForRobotTurn((boolean) actionValue);
+                    break;
+                case "setAdjustRadarForGunTurn":
+                    setAdjustRadarForGunTurn((boolean) actionValue);
+                    break;
+                case "scan":
+                    scan();
+                    break;
+
+                // gun movement and firing
+                case "turnGunLeft":
+                    turnGunLeft((double) actionValue);
+                    break;
+                case "turnGunRight":
+                    turnGunRight((double) actionValue);
+                    break;
+                case "setAdjustGunForRobotTurn":
+                    setAdjustGunForRobotTurn((boolean) actionValue);
+                    break;
+                case "fire":
+                    fire((double) actionValue);
+                    break;
+
+                // stop/resume
+                case "stop":
+                    stop((boolean) actionValue);
+                    break;
+                case "resume":
+                    resume();
+                    break;
             }
+
+            setState();
         }
-
-        // race condition:  if a terminal condition is encountered (robot death or win) just after the setState call
-        // above, then we might potentially not send the terminal condition to the server, locking it up. send a final
-        // state message to ensure that the server terminates the episode.
-        setState();
     }
 
     /**
@@ -163,8 +144,8 @@ public class RlaiRobot extends Robot {
 
             // clear any events before sending the new state to the server
             _events.clear();
-            Entity<String> payload = getStatePayload();
-            _resetInvocationBuilder.put(payload, String.class);
+            String payload = getStatePayload();
+            _clientWriter.println(payload);
         }
     }
 
@@ -173,23 +154,21 @@ public class RlaiRobot extends Robot {
      *
      * @return Action dictionary.
      */
-    private Map<String, Object> getAction() {
+    private Map<String, Object> getAction() throws IOException {
 
-        String actionResponseJSON = _getActionInvocationBuilder.get(String.class);
-        Map<String, Map<String, Object>> actionResponseMap = _gson.fromJson(actionResponseJSON, Map.class);
-
-        return actionResponseMap.get("action");
+        String actionResponseJSON = _clientReader.readLine();
+        return _gson.fromJson(actionResponseJSON, Map.class);
     }
 
     /**
-     * Set state at the server.
+     * Send state to the server.
      */
     private void setState() {
 
         synchronized (_events) {
 
-            Entity<String> payload = getStatePayload();
-            _setStateInvocationBuilder.put(payload, String.class);
+            String payload = getStatePayload();
+            _clientWriter.println(payload);
 
             // all events were sent to the server. clear them so they don't get sent again.
             _events.clear();
@@ -199,9 +178,9 @@ public class RlaiRobot extends Robot {
     /**
      * Get state payload for sending to the server.
      *
-     * @return Payload entity.
+     * @return Payload String.
      */
-    private Entity<String> getStatePayload() {
+    private String getStatePayload() {
 
         updateState();
 
@@ -209,9 +188,7 @@ public class RlaiRobot extends Robot {
         payload.put("state", _state);
         payload.put("events", _events);
 
-        String payload_json = _gson.toJson(payload);
-
-        return Entity.json(payload_json);
+        return _gson.toJson(payload);
     }
 
     /**
