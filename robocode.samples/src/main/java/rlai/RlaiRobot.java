@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Robot that interfaces with the RLAI REST server.
+ * Robot that interfaces with the RLAI TCP environment server.
  */
 public class RlaiRobot extends Robot {
 
@@ -37,7 +37,7 @@ public class RlaiRobot extends Robot {
     }
 
     /**
-     * Thread target. Runs the robot by obtaining actions from the RLAI REST server and sending state information back.
+     * Thread target. Runs the robot by obtaining actions from the RLAI TCP server and sending state information back.
      */
     public void run() {
 
