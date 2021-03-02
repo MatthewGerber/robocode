@@ -9,5 +9,7 @@ RemoteSystemsTempFiles
 gradle-app.setting
 !gradle-wrapper.jar
 **/build/
+!/build/
+!/build/robocode-rlai-setup.jar
 .sandbox
 .idea/uiDesigner.xml

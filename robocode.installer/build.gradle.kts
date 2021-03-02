@@ -28,7 +28,7 @@ tasks {
         manifest {
             attributes(mapOf("Main-Class" to "net.sf.robocode.installer.AutoExtract"))
         }
-        archiveFileName.set("robocode-${project.version}-setup.jar")
+        archiveFileName.set("robocode-rlai-setup.jar")
         destinationDirectory.set(file("$buildDir/../../build"))
 
         into("javadoc") {
