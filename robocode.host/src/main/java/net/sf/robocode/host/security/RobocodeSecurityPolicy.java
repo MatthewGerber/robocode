@@ -19,7 +19,10 @@ import net.sf.robocode.repository.IRepositoryManager;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
+import java.lang.reflect.ReflectPermission;
 import java.net.MalformedURLException;
+import java.net.SocketPermission;
+import java.net.URLPermission;
 import java.security.*;
 import java.util.*;
 
@@ -112,6 +115,19 @@ public class RobocodeSecurityPolicy extends Policy {
 
 		if (perm instanceof FilePermission && actions.equals("read") && isFileReadSecutityOff) {
 			return true;
+		}
+
+		if (RobocodeProperties.isAllowLocalhostOn()) {
+
+			if (perm instanceof URLPermission && name.startsWith("127.0.0.1")) {
+				return true;
+			}
+			else if (perm instanceof SocketPermission && name.startsWith("127.0.0.1")) {
+				return true;
+			}
+			else if (perm instanceof ReflectPermission && name.equals("suppressAccessChecks")) {
+				return true;
+			}
 		}
 
 		// Allow reading of properties.

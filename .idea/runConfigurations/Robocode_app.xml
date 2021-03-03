@@ -2,7 +2,7 @@
   <configuration default="false" name="Robocode app" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="net.sf.robocode.main.Robocode" />
     <module name="robocode.robocode.main.main" />
-    <option name="VM_PARAMETERS" value="-DNOSECURITY=true" />
+    <option name="VM_PARAMETERS" value="-DALLOWLOCALHOST=true" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.sandbox" />
     <method v="2">
       <option name="Make" enabled="true" />

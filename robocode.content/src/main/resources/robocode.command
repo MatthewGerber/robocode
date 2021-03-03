@@ -9,5 +9,5 @@
 
 pwd=`pwd`
 cd "${0%/*}"
-java -DNOSECURITY=true -Xdock:icon=robocode.ico -Xdock:name=Robocode -Xmx512M -cp libs/robocode.jar:libs/gson-2.8.6.jar -XX:+IgnoreUnrecognizedVMOptions "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED" "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" "--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED" "--add-opens=java.desktop/sun.awt=ALL-UNNAMED" robocode.Robocode $*
+java -DALLOWLOCALHOST=true -Xdock:icon=robocode.ico -Xdock:name=Robocode -Xmx512M -cp libs/robocode.jar:libs/gson-2.8.6.jar -XX:+IgnoreUnrecognizedVMOptions "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED" "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" "--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED" "--add-opens=java.desktop/sun.awt=ALL-UNNAMED" robocode.Robocode $*
 cd "${pwd}"

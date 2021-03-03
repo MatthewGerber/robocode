@@ -138,6 +138,11 @@ public class RobocodeSecurityManager extends SecurityManager {
         super.checkPermission(perm);
 
         if (perm instanceof SocketPermission) {
+
+        	if (perm.getName().startsWith("127.0.0.1") && RobocodeProperties.isAllowLocalhostOn()) {
+        		return;
+			}
+
     		IHostedThread robotProxy = threadManager.getLoadedOrLoadingRobotProxy(c);
         	String message = "Using socket is not allowed";
         	robotProxy.punishSecurityViolation(message);

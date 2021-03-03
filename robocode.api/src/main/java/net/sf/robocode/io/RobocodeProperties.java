@@ -18,6 +18,7 @@ public final class RobocodeProperties {
 	// These properties can only be set at startup
 	private static final boolean NO_SECURITY = System.getProperty("NOSECURITY", "false").equals("true");
 	private static final boolean DEBUG = System.getProperty("debug", "false").equals("true");
+	private static final boolean ALLOW_LOCALHOST = System.getProperty("ALLOWLOCALHOST", "false").equals("true");
 
 	private RobocodeProperties() {}
 
@@ -52,6 +53,12 @@ public final class RobocodeProperties {
 	public static boolean isDebuggingOn() {
 		return DEBUG;
 	}
+
+	/**
+	 * Checks if access to localhost (127.0.0.1) is allowed.
+	 * @return true if access to localhost is allowed; false is access to localhost is disallowed.
+	 */
+	public static boolean isAllowLocalhostOn() { return ALLOW_LOCALHOST; }
 
 	/**
 	 * Sets the testing flag.
