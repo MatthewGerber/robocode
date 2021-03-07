@@ -2,12 +2,14 @@ package sample.rlai;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import robocode.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.channels.SocketChannel;
@@ -20,6 +22,7 @@ import java.util.Map;
  */
 public class RlaiRobot extends Robot {
 
+    private Socket _socket;
     private PrintWriter _clientWriter;
     private BufferedReader _clientReader;
 
@@ -50,81 +53,90 @@ public class RlaiRobot extends Robot {
             return;
         }
 
-        while(true) {
+        try {
+            while (true) {
 
-            // get and execute the next action
-            Map<String, Object> action;
+                // get and execute the next action
+                Map<String, Object> action;
+                try {
+                    action = getAction();
+                } catch (IOException e) {
+                    System.out.println("Exception while getting action from server:  " + e.getClass().getSimpleName());
+                    break;
+                }
+
+                String actionName = (String) action.get("name");
+                Object actionValue = action.get("value");
+
+                switch (actionName) {
+
+                    case "doNothing":
+                        doNothing();
+                        break;
+
+                    // robot movement
+                    case "ahead":
+                        ahead((double) actionValue);
+                        break;
+                    case "back":
+                        back((double) actionValue);
+                        break;
+                    case "turnLeft":
+                        turnLeft((double) actionValue);
+                        break;
+                    case "turnRight":
+                        turnRight((double) actionValue);
+                        break;
+
+                    // radar movement and scanning
+                    case "turnRadarLeft":
+                        turnRadarLeft((double) actionValue);
+                        break;
+                    case "turnRadarRight":
+                        turnRadarRight((double) actionValue);
+                        break;
+                    case "setAdjustRadarForRobotTurn":
+                        setAdjustRadarForRobotTurn((boolean) actionValue);
+                        break;
+                    case "setAdjustRadarForGunTurn":
+                        setAdjustRadarForGunTurn((boolean) actionValue);
+                        break;
+                    case "scan":
+                        scan();
+                        break;
+
+                    // gun movement and firing
+                    case "turnGunLeft":
+                        turnGunLeft((double) actionValue);
+                        break;
+                    case "turnGunRight":
+                        turnGunRight((double) actionValue);
+                        break;
+                    case "setAdjustGunForRobotTurn":
+                        setAdjustGunForRobotTurn((boolean) actionValue);
+                        break;
+                    case "fire":
+                        fire((double) actionValue);
+                        break;
+
+                    // stop/resume
+                    case "stop":
+                        stop((boolean) actionValue);
+                        break;
+                    case "resume":
+                        resume();
+                        break;
+                }
+
+                setState();
+            }
+        }
+        finally {
             try {
-                action = getAction();
+                _socket.close();
             } catch (IOException e) {
-                System.out.println("Exception while getting action from RLAI server:  " + e.getClass().getSimpleName());
-                break;
+                System.out.println("Exception while closing socket:  " + e.getClass().getSimpleName());
             }
-
-            String actionName = (String) action.get("name");
-            Object actionValue = action.get("value");
-
-            switch (actionName) {
-
-                case "doNothing":
-                    doNothing();
-                    break;
-
-                // robot movement
-                case "ahead":
-                    ahead((double) actionValue);
-                    break;
-                case "back":
-                    back((double) actionValue);
-                    break;
-                case "turnLeft":
-                    turnLeft((double) actionValue);
-                    break;
-                case "turnRight":
-                    turnRight((double) actionValue);
-                    break;
-
-                // radar movement and scanning
-                case "turnRadarLeft":
-                    turnRadarLeft((double) actionValue);
-                    break;
-                case "turnRadarRight":
-                    turnRadarRight((double) actionValue);
-                    break;
-                case "setAdjustRadarForRobotTurn":
-                    setAdjustRadarForRobotTurn((boolean) actionValue);
-                    break;
-                case "setAdjustRadarForGunTurn":
-                    setAdjustRadarForGunTurn((boolean) actionValue);
-                    break;
-                case "scan":
-                    scan();
-                    break;
-
-                // gun movement and firing
-                case "turnGunLeft":
-                    turnGunLeft((double) actionValue);
-                    break;
-                case "turnGunRight":
-                    turnGunRight((double) actionValue);
-                    break;
-                case "setAdjustGunForRobotTurn":
-                    setAdjustGunForRobotTurn((boolean) actionValue);
-                    break;
-                case "fire":
-                    fire((double) actionValue);
-                    break;
-
-                // stop/resume
-                case "stop":
-                    stop((boolean) actionValue);
-                    break;
-                case "resume":
-                    resume();
-                    break;
-            }
-
-            setState();
         }
     }
 
@@ -134,9 +146,9 @@ public class RlaiRobot extends Robot {
     private void resetForNewRun() throws IOException {
 
         SocketChannel channel = SocketChannel.open(new InetSocketAddress("127.0.0.1", 54321));
-        Socket socket = channel.socket();
-        _clientWriter = new PrintWriter(socket.getOutputStream(), true);
-        _clientReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        _socket = channel.socket();
+        _clientWriter = new PrintWriter(_socket.getOutputStream(), true);
+        _clientReader = new BufferedReader(new InputStreamReader(_socket.getInputStream()));
 
         synchronized (_events) {
             String payload = getStatePayload();
@@ -151,8 +163,9 @@ public class RlaiRobot extends Robot {
      */
     private Map<String, Object> getAction() throws IOException {
 
+        Type actionMapType = new TypeToken<Map<String, Object>>() {}.getType();
         String actionResponseJSON = _clientReader.readLine();
-        return _gson.fromJson(actionResponseJSON, Map.class);
+        return _gson.fromJson(actionResponseJSON, actionMapType);
     }
 
     /**
