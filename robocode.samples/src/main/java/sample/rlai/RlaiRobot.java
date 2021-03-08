@@ -18,6 +18,47 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Event for firing a bullet.
+ */
+class BulletFiredEvent {
+
+    /**
+     * Reference to bullet.
+     */
+    private final Bullet bullet;
+
+    /**
+     * Get bullet that was fired.
+     *
+     * @return Bullet.
+     */
+    public Bullet getBullet() { return bullet; }
+
+    /**
+     * Time (turn) in which the bullet was fired.
+     */
+    private final long time;
+
+    /**
+     * Get time (turn) in which the bullet was fired.
+     *
+     * @return Time (turn).
+     */
+    public long getTime() { return time; }
+
+    /**
+     * Constructor.
+     *
+     * @param bullet Bullet.
+     * @param time Time (turn).
+     */
+    public BulletFiredEvent(Bullet bullet, long time) {
+        this.bullet = bullet;
+        this.time = time;
+    }
+}
+
+/**
  * Robot that interfaces with the RLAI TCP environment server.
  */
 public class RlaiRobot extends Robot {
@@ -27,7 +68,7 @@ public class RlaiRobot extends Robot {
     private BufferedReader _clientReader;
 
     private final HashMap<String, Object> _state;
-    private final HashMap<String, ArrayList<Event>> _events;
+    private final HashMap<String, ArrayList<Object>> _events;
     private final Gson _gson;
 
     /**
@@ -116,7 +157,11 @@ public class RlaiRobot extends Robot {
                         setAdjustGunForRobotTurn((boolean) actionValue);
                         break;
                     case "fire":
-                        fire((double) actionValue);
+                        Bullet bullet = fireBullet((double) actionValue);
+                        if (bullet != null) {
+                            BulletFiredEvent bulletFiredEvent = new BulletFiredEvent(bullet, getTime());
+                            addEvent(bulletFiredEvent);
+                        }
                         break;
 
                     // stop/resume
@@ -274,10 +319,10 @@ public class RlaiRobot extends Robot {
         addEvent(event);
     }
 
-    private void addEvent(Event event) {
+    private void addEvent(Object event) {
         synchronized (_events) {
             String type = event.getClass().getSimpleName();
-            ArrayList<Event> list;
+            ArrayList<Object> list;
             if (_events.containsKey(type)) {
                 list = _events.get(type);
             } else {
