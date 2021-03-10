@@ -106,6 +106,11 @@ public class RlaiRobot extends Robot {
                     break;
                 }
 
+                if (action == null) {
+                    System.out.println("RLAI server returned null action. Terminating RLAI robot thread.");
+                    break;
+                }
+
                 String actionName = (String) action.get("name");
                 Object actionValue = action.get("value");
 

@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  */
 public final class Battle extends BaseBattle {
 
-	private static final int DEBUG_TURN_WAIT_MILLIS = 10 * 60 * 1000; // 10 seconds
+	private static final int DEBUG_TURN_WAIT_MILLIS = 10000; // 10 seconds
 
 	private final IHostManager hostManager;
 	private final long cpuConstant;
