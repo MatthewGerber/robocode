@@ -23,9 +23,9 @@ public class AimingTrainer extends AdvancedRobot {
 
 		while (true) {
 			if (movingForward) {
-				ahead(getRoundNum());
+				ahead(5);
 			} else {
-				back(getRoundNum());
+				back(5);
 			}
 			for (int i = 0; i < 500 - getRoundNum(); ++i) {
 				doNothing();
