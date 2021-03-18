@@ -100,7 +100,7 @@ public class RlaiRobot extends Robot {
                 // get and execute the next action
                 Map<String, Object> action;
                 try {
-                    action = getAction();
+                    action = readAction();
                 } catch (IOException e) {
                     System.out.println("Exception while getting action from server:  " + e.getClass().getSimpleName());
                     break;
@@ -178,7 +178,7 @@ public class RlaiRobot extends Robot {
                         break;
                 }
 
-                setState();
+                writeState();
             }
         }
         finally {
@@ -207,11 +207,11 @@ public class RlaiRobot extends Robot {
     }
 
     /**
-     * Get the next action from the server.
+     * Read the next action from the server.
      *
      * @return Action dictionary.
      */
-    private Map<String, Object> getAction() throws IOException {
+    private Map<String, Object> readAction() throws IOException {
 
         Type actionMapType = new TypeToken<Map<String, Object>>() {}.getType();
         String actionResponseJSON = _clientReader.readLine();
@@ -219,9 +219,9 @@ public class RlaiRobot extends Robot {
     }
 
     /**
-     * Send state to the server.
+     * Write current state to the server.
      */
-    private void setState() {
+    private void writeState() {
 
         synchronized (_events) {
 
