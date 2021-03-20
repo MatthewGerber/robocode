@@ -27,7 +27,7 @@ public class AimingTrainer extends AdvancedRobot {
 			} else {
 				back(5);
 			}
-			for (int i = 0; i < 40 - getRoundNum(); ++i) {
+			for (int i = 0; i < 120 - getRoundNum(); ++i) {
 				doNothing();
 			}
 		}
