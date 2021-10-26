@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.abs;
+
 /**
  * Event for firing a bullet.
  */
@@ -61,7 +63,7 @@ class BulletFiredEvent {
 /**
  * Robot that interfaces with the RLAI TCP environment server.
  */
-public class RlaiRobot extends Robot {
+public class RlaiRobot extends AdvancedRobot {
 
     private Socket _socket;
     private PrintWriter _clientWriter;
@@ -81,7 +83,8 @@ public class RlaiRobot extends Robot {
     }
 
     /**
-     * Thread target. Runs the robot by obtaining actions from the RLAI TCP server and sending state information back.
+     * Thread target. Runs the robot by obtaining actions from the RLAI TCP server, executing the actions, and sending
+     * state information back.
      */
     public void run() {
 
@@ -114,68 +117,109 @@ public class RlaiRobot extends Robot {
                 String actionName = (String) action.get("name");
                 Object actionValue = action.get("value");
 
-                switch (actionName) {
+                /* there are two modes of operation:  (1) discrete, unidimensional action and (2) continuous,
+                 * multidimensional. in (1), we receive a single action with a value, execute it, and respond with the
+                 * updated state. in (2), we receive an action vector, set up all actions to execute in parallel, wait
+                 * for all actions to complete, and respond with the updated state.
+                 */
 
-                    case "doNothing":
-                        doNothing();
-                        break;
+                if (actionValue instanceof ArrayList<?>) {
 
-                    // robot movement
-                    case "ahead":
-                        ahead((double) actionValue);
-                        break;
-                    case "back":
-                        back((double) actionValue);
-                        break;
-                    case "turnLeft":
-                        turnLeft((double) actionValue);
-                        break;
-                    case "turnRight":
-                        turnRight((double) actionValue);
-                        break;
+                    ArrayList<Float> actionValueList = (ArrayList<Float>) actionValue;
 
-                    // radar movement and scanning
-                    case "turnRadarLeft":
-                        turnRadarLeft((double) actionValue);
-                        break;
-                    case "turnRadarRight":
-                        turnRadarRight((double) actionValue);
-                        break;
-                    case "setAdjustRadarForRobotTurn":
-                        setAdjustRadarForRobotTurn((boolean) actionValue);
-                        break;
-                    case "setAdjustRadarForGunTurn":
-                        setAdjustRadarForGunTurn((boolean) actionValue);
-                        break;
-                    case "scan":
-                        scan();
-                        break;
+                    // ahead
+                    setAhead(actionValueList.get(0));
 
-                    // gun movement and firing
-                    case "turnGunLeft":
-                        turnGunLeft((double) actionValue);
-                        break;
-                    case "turnGunRight":
-                        turnGunRight((double) actionValue);
-                        break;
-                    case "setAdjustGunForRobotTurn":
-                        setAdjustGunForRobotTurn((boolean) actionValue);
-                        break;
-                    case "fire":
-                        Bullet bullet = fireBullet((double) actionValue);
-                        if (bullet != null) {
-                            BulletFiredEvent bulletFiredEvent = new BulletFiredEvent(bullet, getTime());
-                            addEvent(bulletFiredEvent);
-                        }
-                        break;
+                    // turn left
+                    setTurnLeft(actionValueList.get(1));
 
-                    // stop/resume
-                    case "stop":
-                        stop((boolean) actionValue);
-                        break;
-                    case "resume":
-                        resume();
-                        break;
+                    // turn radar left
+                    setTurnRadarLeft(actionValueList.get(2));
+
+                    // turn gun left
+                    setTurnGunLeft(actionValueList.get(3));
+
+                    // fire
+                    Bullet bullet = setFireBullet(actionValueList.get(4));
+                    if (bullet != null) {
+                        BulletFiredEvent bulletFiredEvent = new BulletFiredEvent(bullet, getTime());
+                        addEvent(bulletFiredEvent);
+                    }
+
+                    // execute all actions and wait for them to finish
+                    execute();
+                    while (abs(getDistanceRemaining()) > 0.0 ||
+                            abs(getTurnRemaining()) > 0.0 ||
+                            abs(getRadarTurnRemaining()) > 0.0 ||
+                            abs(getGunTurnRemaining()) > 0.0) {
+                        execute();
+                    }
+                }
+                else {
+
+                    switch (actionName) {
+
+                        case "doNothing":
+                            doNothing();
+                            break;
+
+                        // robot movement
+                        case "ahead":
+                            ahead((double) actionValue);
+                            break;
+                        case "back":
+                            back((double) actionValue);
+                            break;
+                        case "turnLeft":
+                            turnLeft((double) actionValue);
+                            break;
+                        case "turnRight":
+                            turnRight((double) actionValue);
+                            break;
+
+                        // radar movement and scanning
+                        case "turnRadarLeft":
+                            turnRadarLeft((double) actionValue);
+                            break;
+                        case "turnRadarRight":
+                            turnRadarRight((double) actionValue);
+                            break;
+                        case "setAdjustRadarForRobotTurn":
+                            setAdjustRadarForRobotTurn((boolean) actionValue);
+                            break;
+                        case "setAdjustRadarForGunTurn":
+                            setAdjustRadarForGunTurn((boolean) actionValue);
+                            break;
+                        case "scan":
+                            scan();
+                            break;
+
+                        // gun movement and firing
+                        case "turnGunLeft":
+                            turnGunLeft((double) actionValue);
+                            break;
+                        case "turnGunRight":
+                            turnGunRight((double) actionValue);
+                            break;
+                        case "setAdjustGunForRobotTurn":
+                            setAdjustGunForRobotTurn((boolean) actionValue);
+                            break;
+                        case "fire":
+                            Bullet bullet = fireBullet((double) actionValue);
+                            if (bullet != null) {
+                                BulletFiredEvent bulletFiredEvent = new BulletFiredEvent(bullet, getTime());
+                                addEvent(bulletFiredEvent);
+                            }
+                            break;
+
+                        // stop/resume
+                        case "stop":
+                            stop((boolean) actionValue);
+                            break;
+                        case "resume":
+                            resume();
+                            break;
+                    }
                 }
 
                 writeState();
