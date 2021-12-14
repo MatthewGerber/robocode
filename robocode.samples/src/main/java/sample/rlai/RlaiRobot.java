@@ -88,7 +88,9 @@ public class RlaiRobot extends AdvancedRobot {
      */
     public void run() {
 
+        setAdjustGunForRobotTurn(true);
         setAdjustRadarForGunTurn(true);
+        setAdjustRadarForRobotTurn(true);
 
         try {
             resetForNewRun();
@@ -114,7 +116,6 @@ public class RlaiRobot extends AdvancedRobot {
                     break;
                 }
 
-                String actionName = (String) action.get("name");
                 Object actionValue = action.get("value");
 
                 /* there are two modes of operation:  (1) discrete, unidimensional action and (2) continuous,
@@ -123,24 +124,25 @@ public class RlaiRobot extends AdvancedRobot {
                  * for all actions to complete, and respond with the updated state.
                  */
 
+                // process mode (2)
                 if (actionValue instanceof ArrayList<?>) {
 
-                    ArrayList<Float> actionValueList = (ArrayList<Float>) actionValue;
+                    ArrayList<?> actionValueList = (ArrayList<?>) actionValue;
 
                     // ahead
-                    setAhead(actionValueList.get(0));
+                    setAhead((Double)actionValueList.get(0));
 
                     // turn left
-                    setTurnLeft(actionValueList.get(1));
+                    setTurnLeft((Double)actionValueList.get(1));
 
                     // turn radar left
-                    setTurnRadarLeft(actionValueList.get(2));
+                    setTurnRadarLeft((Double)actionValueList.get(2));
 
                     // turn gun left
-                    setTurnGunLeft(actionValueList.get(3));
+                    setTurnGunLeft((Double)actionValueList.get(3));
 
                     // fire
-                    Bullet bullet = setFireBullet(actionValueList.get(4));
+                    Bullet bullet = setFireBullet((Double)actionValueList.get(4));
                     if (bullet != null) {
                         BulletFiredEvent bulletFiredEvent = new BulletFiredEvent(bullet, getTime());
                         addEvent(bulletFiredEvent);
@@ -155,7 +157,11 @@ public class RlaiRobot extends AdvancedRobot {
                         execute();
                     }
                 }
+
+                // process mode (1)
                 else {
+
+                    String actionName = (String) action.get("name");
 
                     switch (actionName) {
 
