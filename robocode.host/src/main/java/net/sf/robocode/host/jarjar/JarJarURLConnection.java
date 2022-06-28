@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,7 +29,7 @@ public class JarJarURLConnection extends URLConnection {
 	private final static char SEPARATOR_CHAR = JarJar.SEPARATOR_CHAR; // this is '^' now
 	private final static String SEPARATOR = SEPARATOR_CHAR + "/";
 
-	private URLConnection connection;
+	private final URLConnection connection;
 	private static boolean registered;
 
 	private JarJarURLConnection(URL url)
@@ -102,7 +102,7 @@ public class JarJarURLConnection extends URLConnection {
 			boolean refOnly = refPos == start;
 
 			if (refPos > -1) {
-				ref = spec.substring(refPos + 1, spec.length());
+				ref = spec.substring(refPos + 1);
 				if (refOnly) {
 					file = url.getFile();
 				}

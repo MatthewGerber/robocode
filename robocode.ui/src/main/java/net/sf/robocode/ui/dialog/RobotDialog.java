@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,7 @@ package net.sf.robocode.ui.dialog;
 
 
 import net.sf.robocode.battle.IBattleManager;
+import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.ui.IWindowManager;
 import robocode.control.events.*;
 import robocode.control.snapshot.IDebugProperty;
@@ -326,6 +327,7 @@ public class RobotDialog extends JFrame {
 		if (paintButton == null) {
 			paintButton = new JToggleButton("Paint");
 			paintButton.addActionListener(eventHandler);
+			paintButton.setSelected(RobocodeProperties.isPaintingOn());
 		}
 		return paintButton;
 	}

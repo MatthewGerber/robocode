@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import net.sf.robocode.peer.ExecCommands;
 import net.sf.robocode.serialization.*;
 import robocode.control.snapshot.BulletState;
 import robocode.control.snapshot.IBulletSnapshot;
+import robocode.util.Utils;
 
 import java.io.IOException;
 
@@ -28,7 +29,7 @@ import java.io.IOException;
  *
  * @since 1.6.1
  */
-public final class BulletSnapshot implements java.io.Serializable, IXmlSerializable, ICsvSerializable, IBulletSnapshot {
+public final class BulletSnapshot implements java.io.Serializable, IXmlSerializable, IBulletSnapshot {
 
 	private static final long serialVersionUID = 2L;
 
@@ -118,10 +119,14 @@ public final class BulletSnapshot implements java.io.Serializable, IXmlSerializa
 		heading = bullet.getHeading();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
-		return ownerIndex + "-" + bulletId + " (" + (int) power + ") X" + (int) x + " Y" + (int) y + " "
-				+ state.toString();
+		return ownerIndex + "-" + bulletId + " (" + (int) power + ") X" + (int) x + " Y" + (int) y
+				+ " ~" + Utils.angleToApproximateDirection(heading)
+				+ " " + state.toString();
 	}
 
 	/**
@@ -261,15 +266,6 @@ public final class BulletSnapshot implements java.io.Serializable, IXmlSerializa
 			}
 		}
 		writer.endElement();
-	}
-
-	@Override
-	public void writeCsv(CsvWriter writer, SerializableOptions options) throws IOException {
-		writer.writeValue(state.toString());
-		writer.writeValue(heading, options.trimPrecision);
-		writer.writeValue(paintX, options.trimPrecision);
-		writer.writeValue(paintY, options.trimPrecision);
-		writer.writeValue(victimIndex);
 	}
 
 	/**

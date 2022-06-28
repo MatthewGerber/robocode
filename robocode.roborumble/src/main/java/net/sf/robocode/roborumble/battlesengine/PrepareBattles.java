@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -259,7 +259,7 @@ public class PrepareBattles {
 		int count = 0;
 
 		// Add priority battles
-		while (count < numbattles && count < priorityBattles.size()) {
+		while (count < numbattles - namesNoRanking.size() && count < priorityBattles.size()) {
 			String battle = priorityBattles.get(count);
 
 			String[] items = battle.split(",");

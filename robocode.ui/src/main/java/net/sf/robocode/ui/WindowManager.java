@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,9 +14,11 @@ import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.core.Container;
 import net.sf.robocode.host.ICpuManager;
 import net.sf.robocode.io.FileUtil;
+import net.sf.robocode.io.Logger;
 import net.sf.robocode.repository.IRepositoryManager;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.battle.AwtBattleAdaptor;
+import net.sf.robocode.ui.battleview.ScreenshotUtil;
 import net.sf.robocode.ui.dialog.*;
 import net.sf.robocode.ui.packager.RobotPackager;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
@@ -30,6 +32,7 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 
 
@@ -145,7 +148,7 @@ public class WindowManager implements IWindowManagerExt {
 		if (iconified) {
 			frame.setState(Frame.ICONIFIED);
 		}
-		
+
 		if (visible) {
 			// Pack frame to size all components
 			WindowUtil.packCenterShow(frame);
@@ -250,7 +253,7 @@ public class WindowManager implements IWindowManagerExt {
 	}
 
 	public void showJavaDocumentation() {
-		showInBrowser("https://docs.oracle.com/javase/8/docs/api/");
+		showInBrowser("https://docs.oracle.com/en/java/javase/16/docs/api/index.html");
 	}
 
 	public void showRobocodeHome() {
@@ -526,6 +529,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	/**
 	 * Packs, centers, and shows the specified window on the screen.
+     *
 	 * @param window the window to pack, center, and show
 	 * @param center {@code true} if the window must be centered; {@code false} otherwise
 	 */
@@ -614,6 +618,22 @@ public class WindowManager implements IWindowManagerExt {
 			}
 		}
 	}
+
+    @Override
+    public void takeScreenshot() {
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                public void run() {
+                    awtAdaptor.awtOnTurnEnded(true, false);
+                    robocodeFrame.takeScreenshot();
+                }
+            });
+        } catch (InterruptedException e) {
+            Logger.logError(e);
+        } catch (InvocationTargetException e) {
+            Logger.logError(e);
+        }
+    }
 
 	public void setVisibleForRobotEngine(boolean visible) {
 		if (visible && !isGUIEnabled()) {

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@ package net.sf.robocode.test.robots;
 
 import net.sf.robocode.test.helpers.Assert;
 import net.sf.robocode.test.helpers.RobocodeTestBed;
+import org.junit.Test;
 import robocode.control.events.TurnEndedEvent;
 
 
@@ -18,6 +19,11 @@ import robocode.control.events.TurnEndedEvent;
  */
 public class TestConstructorThreadAttack extends RobocodeTestBed {
 	boolean messagedUnknown;
+
+	@Test
+	public void run() {
+		super.run();
+	}
 
 	@Override
 	public void onTurnEnded(TurnEndedEvent event) {
@@ -30,8 +36,8 @@ public class TestConstructorThreadAttack extends RobocodeTestBed {
 	}
 
 	@Override
-	public String getRobotNames() {
-		return "tested.robots.ConstructorThreadAttack,sample.Target";
+	public String getRobotName() {
+		return "tested.robots.ConstructorThreadAttack";
 	}
 
 	@Override

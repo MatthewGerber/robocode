@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,16 @@ public class TestCustomEvents extends RobocodeTestBed {
 	}
 
 	@Override
+	public String getRobotName() {
+		return "sample.Target";
+	}
+
+	@Override
+	public String getEnemyName() {
+		return "tested.robots.CustomEvents";
+	}
+
+	@Override
 	public void onTurnEnded(TurnEndedEvent event) {
 		super.onTurnEnded(event);
 		IRobotSnapshot gh = event.getTurnSnapshot().getRobots()[1];
@@ -47,10 +57,5 @@ public class TestCustomEvents extends RobocodeTestBed {
 	private void test(IRobotSnapshot gh, String s) {
 		Assert.assertTrue("got: " + gh.getOutputStreamSnapshot() + ", expected: " + s,
 				gh.getOutputStreamSnapshot().contains(s));
-	}
-
-	@Override
-	public String getRobotNames() {
-		return "sample.Target,tested.robots.CustomEvents";
 	}
 }

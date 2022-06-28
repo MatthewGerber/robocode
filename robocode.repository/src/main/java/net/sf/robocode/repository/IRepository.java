@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public interface IRepository {
 	 * 
 	 * @see #save(OutputStream)
 	 */
-	public void load(InputStream in);
+    void load(InputStream in);
 
 	/**
 	 * Saves the data in this repository to an output stream.
@@ -43,7 +43,7 @@ public interface IRepository {
 	 * 
 	 * @see #load(InputStream)
 	 */
-	public void save(OutputStream out);
+    void save(OutputStream out);
 
 	/**
 	 * Adds or updates an item.<p>

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class RobotFileOutputStream extends FileOutputStream {
 
-	private RobotFileSystemManager fileSystemManager;
+	private final RobotFileSystemManager fileSystemManager;
 
 	public RobotFileOutputStream(String filename, boolean append, RobotFileSystemManager fileSystemManager) throws IOException {
 		super(filename, append);

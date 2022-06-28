@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@ package net.sf.robocode.battle.peer;
 import net.sf.robocode.peer.BulletStatus;
 import robocode.*;
 import robocode.control.snapshot.BulletState;
+import robocode.util.Utils;
 
 import java.awt.geom.Line2D;
 import static java.lang.Math.cos;
@@ -366,7 +367,9 @@ public class BulletPeer {
 
 	@Override
 	public String toString() {
-		return getOwner().getName() + " V" + getVelocity() + " *" + (int) power + " X" + (int) x + " Y" + (int) y + " H"
-				+ heading + " " + state.toString();
+		return getOwner().getName() + " V" + getVelocity() + " *" + (int) power + " X" + (int) x + " Y" + (int) y
+				+ " H"+ heading
+				+ " ~" + Utils.angleToApproximateDirection(heading)
+				+ " " + state.toString();
 	}
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -143,9 +143,22 @@ public interface IRobocodeEngine {
 	void waitTillBattleOver();
 
 	/**
-	 * Aborts the current battle if it is running.
+	 * Aborts the current battle if it is running and waits for the end.
 	 *
 	 * @see #runBattle(robocode.control.BattleSpecification)
 	 */
 	void abortCurrentBattle();
+
+	/**
+	 * Aborts the current battle if it is running.
+	 *
+	 * @see #runBattle(robocode.control.BattleSpecification)
+	 * @param waitTillEnd will block caller until the battle is over
+	 */
+	void abortCurrentBattle(boolean waitTillEnd);
+
+	/**
+	 * Saves screenshot to disk, if the UI is initialized
+	 */
+	void takeScreenshot();
 }

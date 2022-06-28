@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,14 +24,20 @@ public class TestBulletPower extends RobocodeTestBed {
 		super.run();
 	}
 
-	public String getRobotNames() {
-		return "sample.Target,tested.robots.BadFirePower";
+	@Override
+	public String getRobotName() {
+		return "tested.robots.BadFirePower";
+	}
+
+	@Override
+	public String getEnemyName() {
+		return "sample.Target";
 	}
 
 	@Override
 	public void onTurnEnded(TurnEndedEvent event) {
 		super.onTurnEnded(event);
-		IRobotSnapshot bp = event.getTurnSnapshot().getRobots()[1];
+		IRobotSnapshot bp = event.getTurnSnapshot().getRobots()[0];
 
 		final int time = event.getTurnSnapshot().getTurn();
 

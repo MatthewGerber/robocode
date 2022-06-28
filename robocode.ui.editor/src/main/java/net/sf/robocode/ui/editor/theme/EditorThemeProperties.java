@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,42 +101,42 @@ public class EditorThemeProperties implements IEditorThemeProperties {
 	private String fontName;
 	private Integer fontSize;
 
-	private ColorPropertyStrategy backgroundColor = new ColorPropertyStrategy(BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
-	private ColorPropertyStrategy lineNumberBackgroundColor = new ColorPropertyStrategy(LINE_NUMBER_BACKGROUND_COLOR,
+	private final ColorPropertyStrategy backgroundColor = new ColorPropertyStrategy(BACKGROUND_COLOR, DEFAULT_BACKGROUND_COLOR);
+	private final ColorPropertyStrategy lineNumberBackgroundColor = new ColorPropertyStrategy(LINE_NUMBER_BACKGROUND_COLOR,
 			DEFAULT_LINE_NUMBER_BACKGROUND_COLOR);
-	private ColorPropertyStrategy lineNumberTextColor = new ColorPropertyStrategy(LINE_NUMBER_TEXT_COLOR,
+	private final ColorPropertyStrategy lineNumberTextColor = new ColorPropertyStrategy(LINE_NUMBER_TEXT_COLOR,
 			DEFAULT_LINE_NUMBER_TEXT_COLOR);
-	private ColorPropertyStrategy highlightedLineColor = new ColorPropertyStrategy(HIGHLIGHTED_LINE_COLOR,
+	private final ColorPropertyStrategy highlightedLineColor = new ColorPropertyStrategy(HIGHLIGHTED_LINE_COLOR,
 			DEFAULT_HIGHLIGHTED_LINE_COLOR);
-	private ColorPropertyStrategy selectionColor = new ColorPropertyStrategy(SELECTION_COLOR, DEFAULT_SELECTION_COLOR);
-	private ColorPropertyStrategy selectedTextColor = new ColorPropertyStrategy(SELECTED_TEXT_COLOR,
+	private final ColorPropertyStrategy selectionColor = new ColorPropertyStrategy(SELECTION_COLOR, DEFAULT_SELECTION_COLOR);
+	private final ColorPropertyStrategy selectedTextColor = new ColorPropertyStrategy(SELECTED_TEXT_COLOR,
 			DEFAULT_SELECTED_TEXT_COLOR);
-	private ColorPropertyStrategy normalTextColor = new ColorPropertyStrategy(NORMAL_TEXT_COLOR,
+	private final ColorPropertyStrategy normalTextColor = new ColorPropertyStrategy(NORMAL_TEXT_COLOR,
 			DEFAULT_NORMAL_TEXT_COLOR);
-	private FontStylePropertyStrategy normalTextStyle = new FontStylePropertyStrategy(NORMAL_TEXT_STYLE,
+	private final FontStylePropertyStrategy normalTextStyle = new FontStylePropertyStrategy(NORMAL_TEXT_STYLE,
 			DEFAULT_NORMAL_TEXT_STYLE);
-	private ColorPropertyStrategy commentTextColor = new ColorPropertyStrategy(COMMENT_TEXT_COLOR,
+	private final ColorPropertyStrategy commentTextColor = new ColorPropertyStrategy(COMMENT_TEXT_COLOR,
 			DEFAULT_COMMENT_TEXT_COLOR);
-	private FontStylePropertyStrategy commentTextStyle = new FontStylePropertyStrategy(COMMENT_TEXT_STYLE,
+	private final FontStylePropertyStrategy commentTextStyle = new FontStylePropertyStrategy(COMMENT_TEXT_STYLE,
 			DEFAULT_COMMENT_TEXT_STYLE);
-	private ColorPropertyStrategy quotedTextColor = new ColorPropertyStrategy(QUOTED_TEXT_COLOR,
+	private final ColorPropertyStrategy quotedTextColor = new ColorPropertyStrategy(QUOTED_TEXT_COLOR,
 			DEFAULT_QUOTED_TEXT_COLOR);
-	private FontStylePropertyStrategy quotedTextStyle = new FontStylePropertyStrategy(QUOTED_TEXT_STYLE,
+	private final FontStylePropertyStrategy quotedTextStyle = new FontStylePropertyStrategy(QUOTED_TEXT_STYLE,
 			DEFAULT_QUOTED_TEXT_STYLE);
-	private ColorPropertyStrategy keywordTextColor = new ColorPropertyStrategy(KEYWORD_TEXT_COLOR,
+	private final ColorPropertyStrategy keywordTextColor = new ColorPropertyStrategy(KEYWORD_TEXT_COLOR,
 			DEFAULT_KEYWORD_TEXT_COLOR);
-	private FontStylePropertyStrategy keywordTextStyle = new FontStylePropertyStrategy(KEYWORD_TEXT_STYLE,
+	private final FontStylePropertyStrategy keywordTextStyle = new FontStylePropertyStrategy(KEYWORD_TEXT_STYLE,
 			DEFAULT_KEYWORD_TEXT_STYLE);
-	private ColorPropertyStrategy literalTextColor = new ColorPropertyStrategy(LITERAL_TEXT_COLOR,
+	private final ColorPropertyStrategy literalTextColor = new ColorPropertyStrategy(LITERAL_TEXT_COLOR,
 			DEFAULT_LITERAL_TEXT_COLOR);
-	private FontStylePropertyStrategy literalTextStyle = new FontStylePropertyStrategy(LITERAL_TEXT_STYLE,
+	private final FontStylePropertyStrategy literalTextStyle = new FontStylePropertyStrategy(LITERAL_TEXT_STYLE,
 			DEFAULT_LITERAL_TEXT_STYLE);
-	private ColorPropertyStrategy annotationTextColor = new ColorPropertyStrategy(ANNOTATION_TEXT_COLOR,
+	private final ColorPropertyStrategy annotationTextColor = new ColorPropertyStrategy(ANNOTATION_TEXT_COLOR,
 			DEFAULT_ANNOTATION_TEXT_COLOR);
-	private FontStylePropertyStrategy annotationTextStyle = new FontStylePropertyStrategy(ANNOTATION_TEXT_STYLE,
+	private final FontStylePropertyStrategy annotationTextStyle = new FontStylePropertyStrategy(ANNOTATION_TEXT_STYLE,
 			DEFAULT_ANNOTATION_TEXT_STYLE);
 	
-	private IPropertyStrategy<?>[] colorAndStyleProps = new IPropertyStrategy[] {
+	private final IPropertyStrategy<?>[] colorAndStyleProps = new IPropertyStrategy[] {
 		backgroundColor, lineNumberBackgroundColor, lineNumberTextColor, highlightedLineColor, selectionColor,
 		selectedTextColor, normalTextColor, normalTextStyle, commentTextColor, commentTextStyle, quotedTextColor,
 		quotedTextStyle, keywordTextColor, keywordTextStyle, literalTextColor, literalTextStyle, annotationTextColor,

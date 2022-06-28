@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,15 +70,10 @@ public abstract class Event implements Comparable<Event>, Serializable {
 		// Same time -> Compare the difference in priority
 		int priorityDiff = event.getPriority() - getPriority();
 
-		if (priorityDiff != 0) {
-			return priorityDiff; // Priority differ
-		}
+		return priorityDiff; // Priority differ
 
 		// Same time and priority -> Compare specific event types
 		// look at overrides in ScannedRobotEvent and HitRobotEvent
-
-		// No difference found
-		return 0;
 	}
 
 	/**

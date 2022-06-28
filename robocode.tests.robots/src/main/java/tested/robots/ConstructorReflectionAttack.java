@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,10 +26,10 @@ public class ConstructorReflectionAttack extends robocode.AdvancedRobot {
 
 			field.setAccessible(true);
 			Object obj = field.get(null);
-			Method method = obj.getClass().getMethod("print", new Class[] { String.class });
+			Method method = obj.getClass().getMethod("print", String.class);
 
 			method.setAccessible(true);
-			method.invoke(obj, new Object[] { "Hello World" });
+			method.invoke(obj, "Hello World");
 
 		} catch (Exception e) {
 			// The stack trace from the exception is redirected to a temporary buffer,

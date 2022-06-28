@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,6 +30,7 @@ import robocode.control.events.*;
 import robocode.control.events.RoundEndedEvent;
 import robocode.control.snapshot.BulletState;
 import robocode.control.snapshot.ITurnSnapshot;
+import robocode.robotinterfaces.IBasicRobot;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -48,6 +49,7 @@ import java.util.regex.Pattern;
  * @author Nathaniel Troutman (contributor)
  * @author Julian Kent (contributor)
  * @author Pavel Savara (contributor)
+ * @author Alexander Schultz (contributor)
  */
 public final class Battle extends BaseBattle {
 
@@ -102,43 +104,54 @@ public final class Battle extends BaseBattle {
 		List<String> teamNames = new ArrayList<String>();
 		Map<String, List<String>> teamMembers = new HashMap<String, List<String>>();
 		Map<String /* name */, Integer /* count */> robotNameCount = new HashMap<String, Integer>();
-		Map<RobotSpecification, String /* name */> robotNames = new HashMap<RobotSpecification, String>();
-		Map<RobotSpecification, Integer /* index */> robotIndexes = new HashMap<RobotSpecification, Integer>();
+		int[] robotSuffixNumbers = new int[battlingRobotsList.length];
+		String[] robotSuffixes = new String[battlingRobotsList.length];
+		String[] robotNames = new String[battlingRobotsList.length];
 		Map<String, TeamPeer> teamPeers = new HashMap<String, TeamPeer>();
 
-		int robotIndex = 0;
-		for (RobotSpecification specification : battlingRobotsList) {
-
-			robotIndexes.put(specification, robotIndex++);
-
+		// Populate raw names and suffix numbers (to be included when name duplicates exist)
+		for (int robotIndex = 0; robotIndex < battlingRobotsList.length; robotIndex++) {
+			final RobotSpecification specification = battlingRobotsList[robotIndex];
 			final String name = ((IRobotItem) HiddenAccess.getFileSpecification(specification)).getUniqueFullClassNameWithVersion();
-			Integer count = robotNameCount.get(name);
-			if (count == null) {
-				count = 0;
-			}
+
+			robotNames[robotIndex] = name;
+
+			Integer count = robotNameCount.getOrDefault(name, 0);
 			robotNameCount.put(name, ++count);
+			robotSuffixNumbers[robotIndex] = count;
+		}
 
-			String nameIndexed = name + " (" + count + ')';
-			robotNames.put(specification, nameIndexed);
+		// Append name suffixes and populate team lists
+		for (int robotIndex = 0; robotIndex < battlingRobotsList.length; robotIndex++) {
+			String suffix = "";
+			if (robotNameCount.get(robotNames[robotIndex]) > 1)
+			{
+				suffix = " (" + robotSuffixNumbers[robotIndex] + ")";
+			}
+			robotSuffixes[robotIndex] = suffix;
+			robotNames[robotIndex] += suffix;
 
+			final RobotSpecification specification = battlingRobotsList[robotIndex];
 			final String teamName = HiddenAccess.getRobotTeamName(specification);
 			if (teamName != null) {
 				if (!teamNames.contains(teamName)) {
 					teamNames.add(teamName);
-					teamMembers.put(teamName, new ArrayList<String>());
+					teamMembers.put(teamName, new ArrayList<>());
 				}
-				teamMembers.get(teamName).add(nameIndexed);
+				teamMembers.get(teamName).add(robotNames[robotIndex]);
 			}
 		}
-		
-		for (RobotSpecification specification : battlingRobotsList) {
+
+		for (int robotIndex = 0; robotIndex < battlingRobotsList.length; robotIndex++) {
+			final RobotSpecification specification = battlingRobotsList[robotIndex];
+
 			final String teamName = HiddenAccess.getRobotTeamName(specification);
 			TeamPeer team = null;
 			if (teamName != null) {
 				if (!teamPeers.containsKey(teamName)) {
-					String teamNameIndexed = teamName.substring(0, teamName.length() - 6) + " (" + (teamNames.indexOf(teamName) + 1) + ')';
-	
 					int teamIndex = teamNames.indexOf(teamName);
+					String teamNameIndexed = teamName.substring(0, teamName.length() - 6) + " (" + (teamIndex + 1) + ')';
+
 					team = new TeamPeer(teamNameIndexed, teamMembers.get(teamName), teamIndex);
 	
 					teamPeers.put(teamName, team);
@@ -148,14 +161,7 @@ public final class Battle extends BaseBattle {
 				}
 			}
 
-			robotIndex = robotIndexes.get(specification);
-			String suffix = "";
-			final String name = ((IRobotItem) HiddenAccess.getFileSpecification(specification)).getUniqueFullClassNameWithVersion();
-			if (robotNameCount.get(name) > 1) {
-				suffix = " (" + (robotIndex + 1) + ')';
-			}
-
-			RobotPeer robotPeer = new RobotPeer(this, hostManager, specification, suffix, team, robotIndex);
+			RobotPeer robotPeer = new RobotPeer(this, hostManager, specification, robotNames[robotIndex], robotSuffixes[robotIndex], team, robotIndex);
 			robots.add(robotPeer);
 			if (team == null) {
 				contestants.add(robotPeer);
@@ -293,7 +299,7 @@ public final class Battle extends BaseBattle {
 		}
 
 		if (getRoundNum() == 0) {
-			eventDispatcher.onBattleStarted(new BattleStartedEvent(battleRules, robots.size(), false));
+			eventDispatcher.onBattleStarted(new BattleStartedEvent(battleRules, robots.size(), false, UUID.randomUUID()));
 			if (isPaused) {
 				eventDispatcher.onBattlePaused(new BattlePausedEvent());
 			}
@@ -327,11 +333,18 @@ public final class Battle extends BaseBattle {
 			robotPeer.startRound(waitMillis, waitNanos);
 		}
 
+		List<IBasicRobot> robotObjects = null;
+		if (RobocodeProperties.isTestingOn() && RobocodeProperties.isSecurityOff()) {
+			robotObjects = new ArrayList<>();
+			for (RobotPeer robotPeer : robots) {
+				robotObjects.add(robotPeer.getRobotObject());
+			}
+		}
+
 		Logger.logMessage(""); // puts in a new-line in the log message
 
 		final ITurnSnapshot snapshot = new TurnSnapshot(this, robots, bullets, false);
-
-		eventDispatcher.onRoundStarted(new RoundStartedEvent(snapshot, getRoundNum()));
+		eventDispatcher.onRoundStarted(new RoundStartedEvent(snapshot, getRoundNum(), robotObjects));
 	}
 
 	@Override
@@ -532,6 +545,11 @@ public final class Battle extends BaseBattle {
 		// Move all bots
 		for (RobotPeer robotPeer : getRobotsAtRandom()) {
 			robotPeer.performMove(getRobotsAtRandom(), zapEnergy);
+		}
+
+		// Correct bounding box after collisions
+		for (RobotPeer robotPeer : robots) {
+			robotPeer.updateAfterCollision();
 		}
 
 		// Scan after moved all

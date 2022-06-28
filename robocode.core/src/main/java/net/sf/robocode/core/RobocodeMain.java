@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import net.sf.robocode.util.StringUtil;
 import net.sf.robocode.version.IVersionManager;
 import robocode.control.events.*;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,7 +36,7 @@ import java.io.PrintStream;
 
 /**
  * Robocode - A programming game involving battling AI tanks.<br>
- * Copyright (c) 2001-2019 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  *
  * @see <a target="_top" href="https://robocode.sourceforge.io">robocode.sourceforge.net</a>
  *
@@ -105,12 +105,7 @@ public final class RobocodeMain extends RobocodeMainBase {
 	}
 
 	public void run() {
-		Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {			
-			@Override
-			public void uncaughtException(Thread thread, Throwable t) {
-				t.printStackTrace();
-			}
-		});
+		Thread.setDefaultUncaughtExceptionHandler((thread, t) -> t.printStackTrace());
 
 		try {
 			hostManager.initSecurity();
@@ -192,6 +187,16 @@ public final class RobocodeMain extends RobocodeMainBase {
 		}
 
 		setup.tps = properties.getOptionsBattleDesiredTPS();
+
+		if (GraphicsEnvironment.isHeadless()) {
+			if (windowManager != null) {
+				windowManager.setEnableGUI(false);
+				Logger.logWarning("Disabled GUI on headless system");
+			}
+			if (soundManager != null) {
+				soundManager.setEnableSound(false);
+			}
+		}
 
 		// Disable canonical file path cache under Windows as it causes trouble when returning
 		// paths with differently-capitalized file names.
@@ -293,7 +298,9 @@ public final class RobocodeMain extends RobocodeMainBase {
 		System.out.print(
 				"Usage: robocode [-?] [-help] [-cwd path] [-battle filename [-results filename]\n"
 						+ "                [-record filename] [-recordXML filename] [-replay filename]\n"
-						+ "                [-tps tps] [-minimize] [-nodisplay] [-nosound]\n\n" + "where options include:\n"
+						+ "                [-tps tps] [-minimize] [-nodisplay] [-nosound]\n"
+						+ "\n"
+						+ "where options include:\n"
 						+ "  -? or -help                Prints out the command line usage of Robocode\n"
 						+ "  -cwd <path>                Change the current working directory\n"
 						+ "  -battle <battle file>      Run the battle specified in a battle file\n"
@@ -312,6 +319,8 @@ public final class RobocodeMain extends RobocodeMainBase {
 						+ "  -Ddebug=true|false         Enable/disable debugging used for preventing\n"
 						+ "                             robot timeouts and skipped turns, and allows an\n"
 						+ "                             an unlimited painting buffer when debugging robots\n"
+						+ "  -DPAINTING=true|false      Enable/disable painting all robot painting on the\n"
+						+ "                             screen per default.\n"
 						+ "  -DlogMessages=true|false   Log messages and warnings will be disabled\n"
 						+ "  -DlogErrors=true|false     Log errors will be disabled\n"
 						+ "  -DEXPERIMENTAL=true|false  Enable/disable access to peer in robot interfaces\n"

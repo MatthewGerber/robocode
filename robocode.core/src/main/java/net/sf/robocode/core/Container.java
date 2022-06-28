@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ public final class Container extends ContainerBase {
 	public static final MutablePicoContainer factory;
 	public static final ClassLoader systemLoader;
 	private static final ClassLoader engineLoader;
-	private static Set<String> known = new HashSet<String>();
+	private static final Set<String> known = new HashSet<String>();
 	private static final List<IModule> modules = new ArrayList<IModule>();
 
 	static {
@@ -79,8 +79,17 @@ public final class Container extends ContainerBase {
 				loadFromPath(path);
 			}
 		}
+		// load normal modules
 		for (String path : cp) {
-			loadFromPath(path);
+			if (!path.toLowerCase().contains("robocode.plugin")) {
+				loadFromPath(path);
+			}
+		}
+		// load extensions modules
+		for (String path : cp) {
+			if (path.toLowerCase().contains("robocode.plugin")) {
+				loadFromPath(path);
+			}
 		}
 
 		if (known.size() < 2) {
@@ -116,7 +125,7 @@ public final class Container extends ContainerBase {
 					// load other .jar files in location
 					final File dir = new File(path.substring(0, i));
 
-					Logger.logMessage("Loading plugins from " + dir.toString());
+					Logger.logMessage("Loading plugins from " + dir);
 					loadJars(dir);
 				} else {
 					String name = getModuleName(path);

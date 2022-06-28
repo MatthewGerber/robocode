@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,7 +70,7 @@ public class RobotItem extends RobotSpecItem implements IRobotItem {
 	private RobotType robotType;
 
 	private URL classPathURL;
-	private Set<URL> sourcePathURLs; // This is a Set in order to avoid duplicates
+	private final Set<URL> sourcePathURLs; // This is a Set in order to avoid duplicates
 
 	private URL classURL;
 	private URL propertiesURL;
@@ -552,7 +552,7 @@ public class RobotItem extends RobotSpecItem implements IRobotItem {
 		String path;
 		if (root.isJAR()) {
 			String jarFile = getClassPathURL().getFile();
-			jarFile = jarFile.substring(jarFile.lastIndexOf('/') + 1, jarFile.length());
+			jarFile = jarFile.substring(jarFile.lastIndexOf('/') + 1);
 			path = FileUtil.getRobotsDataDir().getPath();
 			if (jarFile.length() > 0) {
 				path += File.separator + jarFile + '_';
@@ -570,7 +570,7 @@ public class RobotItem extends RobotSpecItem implements IRobotItem {
 		String path;
 		if (root.isJAR()) {
 			String jarFile = getClassPathURL().getFile();	
-			jarFile = jarFile.substring(jarFile.lastIndexOf('/') + 1, jarFile.length());
+			jarFile = jarFile.substring(jarFile.lastIndexOf('/') + 1);
 			path = FileUtil.getRobotsDataDir().getPath();
 			if (jarFile.length() > 0) {
 				path += File.separator + jarFile + '_';

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -91,9 +91,8 @@ class BufferedPipedOutputStream extends OutputStream {
 					// Immediately reasserts the exception by interrupting the caller thread itself
 					Thread.currentThread().interrupt();
 
-					IOException ioException = new IOException("read interrupted");
+					IOException ioException = new IOException("read interrupted", e);
 
-					ioException.initCause(e);
 					throw ioException;
 				}
 			}
@@ -107,7 +106,7 @@ class BufferedPipedOutputStream extends OutputStream {
 		}
 	}
 
-	int read(byte b[], int off, int len) throws IOException {
+	int read(byte[] b, int off, int len) throws IOException {
 		if (b == null) {
 			throw new NullPointerException();
 		} else if (off < 0 || len < 0 || off >= b.length || (off + len) > b.length) {

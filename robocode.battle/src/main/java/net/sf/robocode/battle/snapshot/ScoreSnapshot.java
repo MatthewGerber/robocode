@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import java.io.Serializable;
  *
  * @since 1.6.1
  */
-public final class ScoreSnapshot implements Serializable, IXmlSerializable, IScoreSnapshot, ICsvSerializable {
+public final class ScoreSnapshot implements Serializable, IXmlSerializable, IScoreSnapshot {
 
 	private static final long serialVersionUID = 1L;
 
@@ -338,17 +338,6 @@ public final class ScoreSnapshot implements Serializable, IXmlSerializable, ISco
 		writer.endElement();
 	}
 
-	@Override
-	public void writeCsv(CsvWriter writer, SerializableOptions options) throws IOException {
-		writer.writeValue(currentScore, options.trimPrecision);
-		writer.writeValue(currentSurvivalScore, options.trimPrecision);
-		writer.writeValue(currentBulletDamageScore, options.trimPrecision);
-		writer.writeValue(currentBulletKillBonus, options.trimPrecision);
-		writer.writeValue(currentRammingDamageScore, options.trimPrecision);
-		writer.writeValue(currentRammingKillBonus, options.trimPrecision);
-	}
-
-
 	// allows loading of minimalistic XML
 	ScoreSnapshot(String contestantName) {
 		this.name = contestantName;
@@ -562,9 +551,6 @@ public final class ScoreSnapshot implements Serializable, IXmlSerializable, ISco
 		if (Double.doubleToLongBits(totalSurvivalScore) != Double.doubleToLongBits(other.totalSurvivalScore)) {
 			return false;
 		}
-		if (totalThirds != other.totalThirds) {
-			return false;
-		}
-		return true;
+		return totalThirds == other.totalThirds;
 	}
 }

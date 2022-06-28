@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -226,10 +226,7 @@ public class BattleResults implements java.io.Serializable, Comparable<BattleRes
 		}
 		BattleResults other = (BattleResults) obj;
 
-		if (Double.doubleToLongBits(score) != Double.doubleToLongBits(other.score)) {
-			return false;
-		}
-		return true;
+		return Double.doubleToLongBits(score) == Double.doubleToLongBits(other.score);
 	}
 
 	static ISerializableHelper createHiddenSerializer() {

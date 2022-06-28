@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>robocode</id>
+    <version>1.1.1.1</version>
+    <packageSourceUrl>https://github.com/robo-code/robocode/blob/master/robocode.installer/src/chocolatey/robocode.nuspec</packageSourceUrl>
+    <owners>Pavel Savara, Flemming N. Larsen</owners>
+    <title>Robocode</title>
+    <authors>Mathew A. Nelson, Flemming N. Larsen, Pavel Savara</authors>
+    <projectUrl>https://robocode.sourceforge.io/</projectUrl>
+    <iconUrl>https://robocode.sourceforge.io/gfx/Robocode-robot.svg</iconUrl>
+    <copyright>Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors</copyright>
+    <licenseUrl>https://robocode.sourceforge.io/license/epl-v10.html</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/robo-code/robocode</projectSourceUrl>
+    <tags>robocode</tags>
+    <summary>Build the best - destroy the rest!</summary>
+    <description>Robocode is a programming game, where the goal is to develop a robot battle tank to battle against other tanks in Java. The robot battles are running in real-time and on-screen.</description>
+    <dependencies>
+      <dependency id="openjdk"/>
+    </dependencies>
+    <releaseNotes>Release notes per Robocode version can be found here: https://github.com/robo-code/robocode/blob/master/versions.md</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

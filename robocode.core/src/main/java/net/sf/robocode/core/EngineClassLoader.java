@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,7 @@ import net.sf.robocode.io.RobocodeProperties;
  */
 public class EngineClassLoader extends URLClassLoader {
 
-	private static Set<String> exclusions = new HashSet<String>();
+	private static final Set<String> exclusions = new HashSet<String>();
 	static {
 		// this will be loaded on system classloader
 		exclusions.add(EngineClassLoader.class.getName());
