@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -202,11 +202,7 @@ public class AdvancedRobotProxy extends StandardRobotProxy implements IAdvancedR
 			throw new AccessControlException("no relative path allowed");
 		}
 
-		return AccessController.doPrivileged(new PrivilegedAction<File>() {
-			public File run() {
-				return robotFileSystemManager.getDataFile(filename);
-			}
-		});
+		return AccessController.doPrivileged((PrivilegedAction<File>) () -> robotFileSystemManager.getDataFile(filename));
 	}
 
 	public long getDataQuotaAvailable() {

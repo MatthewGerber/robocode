@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -312,7 +312,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	private void removeButtonActionPerformed() {
 		JList selectedList = getSelectedRobotsList();
 		SelectedRobotsModel selectedModel = (SelectedRobotsModel) selectedList.getModel();
-		int sel[] = selectedList.getSelectedIndices();
+		int[] sel = selectedList.getSelectedIndices();
 
 		for (int i = 0; i < sel.length; i++) {
 			selectedRobots.remove(sel[i] - i);
@@ -437,7 +437,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	}
 
 	private void selectedRobotsListSelectionChanged() {
-		int sel[] = getSelectedRobotsList().getSelectedIndices();
+		int[] sel = getSelectedRobotsList().getSelectedIndices();
 
 		if (sel.length == 1) {
 			availableRobotsPanel.clearSelection();

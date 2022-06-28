@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,9 @@ package net.sf.robocode.test.robots;
 
 
 import net.sf.robocode.test.helpers.RobocodeTestBed;
-import org.junit.Assert;
-import robocode.control.events.TurnEndedEvent;
+import org.junit.Test;
+
+import java.security.AccessControlException;
 
 
 /**
@@ -18,32 +19,14 @@ import robocode.control.events.TurnEndedEvent;
  */
 public class TestSocketAttack extends RobocodeTestBed {
 
-	private boolean messagedAccessDenied;
-	
-	@Override
-	public String getRobotNames() {
-		return "tested.robots.SocketAttack,sample.Target";
-	}
+    @Test(expected = AccessControlException.class)
+    public void run() {
+        super.run();
+    }
 
-	@Override
-	public void onTurnEnded(TurnEndedEvent event) {
-		super.onTurnEnded(event);
+    @Override
+    public String getRobotName() {
+        return "tested.robots.SocketAttack";
+    }
 
-		final String out = event.getTurnSnapshot().getRobots()[0].getOutputStreamSnapshot();
-
-		if (out.contains("access denied (java.net.SocketPermission")
-				|| out.contains("access denied (\"java.net.SocketPermission\"")) {
-			messagedAccessDenied = true;	
-		}	
-	}
-
-	@Override
-	protected void runTeardown() {
-		Assert.assertTrue("Socket connection is not allowed", messagedAccessDenied);
-	}
-
-	@Override
-	protected int getExpectedErrors() {
-		return 1; // Security error must be reported as an error
-	}
 }

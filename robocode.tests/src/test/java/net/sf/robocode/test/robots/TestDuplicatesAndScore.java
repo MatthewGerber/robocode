@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,8 +39,13 @@ public class TestDuplicatesAndScore extends RobocodeTestBed {
 	}
 
 	@Override
-	public String getRobotNames() {
-		return "sample.Fire,tested.robots.TestTeam,tested.robots.TestTeam,sample.Crazy";
+	public String getRobotName() {
+		return "sample.Fire";
+	}
+
+	@Override
+	public String getEnemyName() {
+		return "tested.robots.TestTeam,tested.robots.TestTeam,sample.Crazy";
 	}
 
 	@Override
@@ -116,44 +121,44 @@ public class TestDuplicatesAndScore extends RobocodeTestBed {
 		Assert.assertNotNull(results);
 		Assert.assertNotNull(robots);
 		Assert.assertThat(robots[0].getName(), is("sample.Fire (1)"));
-		Assert.assertThat(robots[1].getName(), is("sampleteam.MyFirstLeader (2)"));
-		Assert.assertThat(robots[2].getName(), is("sampleteam.MyFirstDroid (3)"));
-		Assert.assertThat(robots[3].getName(), is("sample.Fire (4)"));
-		Assert.assertThat(robots[4].getName(), is("sampleteam.MyFirstLeader (5)"));
-		Assert.assertThat(robots[5].getName(), is("sampleteam.MyFirstDroid (6)"));
-		Assert.assertThat(robots[6].getName(), is("sample.Fire (7)"));
+		Assert.assertThat(robots[1].getName(), is("sampleteam.MyFirstLeader (1)"));
+		Assert.assertThat(robots[2].getName(), is("sampleteam.MyFirstDroid (1)"));
+		Assert.assertThat(robots[3].getName(), is("sample.Fire (2)"));
+		Assert.assertThat(robots[4].getName(), is("sampleteam.MyFirstLeader (2)"));
+		Assert.assertThat(robots[5].getName(), is("sampleteam.MyFirstDroid (2)"));
+		Assert.assertThat(robots[6].getName(), is("sample.Fire (3)"));
 		Assert.assertThat(robots[7].getName(), is("sample.Crazy"));
 
 		Assert.assertThat(results[0].getTeamLeaderName(), is("tested.robots.TestTeam (2)"));
 		Assert.assertThat(results[1].getTeamLeaderName(), is("tested.robots.TestTeam (1)"));
-		Assert.assertThat(results[2].getTeamLeaderName(), is("sample.Crazy"));
-		Assert.assertThat(results[3].getTeamLeaderName(), is("sample.Fire (1)"));
+		Assert.assertThat(results[2].getTeamLeaderName(), is("sample.Fire (1)"));
+		Assert.assertThat(results[3].getTeamLeaderName(), is("sample.Crazy"));
 
-		Assert.assertThat(results[0].getLastSurvivorBonus(), is(0));
-		Assert.assertThat(results[1].getLastSurvivorBonus(), is(50));
+		Assert.assertThat(results[0].getLastSurvivorBonus(), is(100));
+		Assert.assertThat(results[1].getLastSurvivorBonus(), is(0));
 		Assert.assertThat(results[2].getLastSurvivorBonus(), is(0));
 		Assert.assertThat(results[3].getLastSurvivorBonus(), is(0));
 
 		Assert.assertThat(results[0].getRamDamage(), is(0));
-		Assert.assertThat(results[1].getRamDamage(), is(11));
-		Assert.assertThat(results[2].getRamDamage(), is(19));
-		Assert.assertThat(results[3].getRamDamage(), is(1));
+		Assert.assertThat(results[1].getRamDamage(), is(2));
+		Assert.assertThat(results[2].getRamDamage(), is(1));
+		Assert.assertThat(results[3].getRamDamage(), is(10));
 
-		Assert.assertThat(results[0].getBulletDamageBonus(), is(67));
-		Assert.assertThat(results[1].getBulletDamageBonus(), is(0));
+		Assert.assertThat(results[0].getBulletDamageBonus(), is(91));
+		Assert.assertThat(results[1].getBulletDamageBonus(), is(18));
 		Assert.assertThat(results[2].getBulletDamageBonus(), is(0));
-		Assert.assertThat(results[3].getBulletDamageBonus(), is(2));
+		Assert.assertThat(results[3].getBulletDamageBonus(), is(0));
 
-		Assert.assertThat(results[0].getBulletDamage(), is(434));
-		Assert.assertThat(results[1].getBulletDamage(), is(300));
-		Assert.assertThat(results[2].getBulletDamage(), is(220));
-		Assert.assertThat(results[3].getBulletDamage(), is(103));
+		Assert.assertThat(results[0].getBulletDamage(), is(501));
+		Assert.assertThat(results[1].getBulletDamage(), is(291));
+		Assert.assertThat(results[2].getBulletDamage(), is(92));
+		Assert.assertThat(results[3].getBulletDamage(), is(48));
 
-		Assert.assertThat(results[0].getScore(), is(901));
+		Assert.assertThat(results[0].getScore(), is(1192));
 		Assert.assertThat(results[1].getScore(), is(661));
-		Assert.assertThat(results[2].getScore(), is(489));
-		Assert.assertThat(results[3].getScore(), is(257));
+		Assert.assertThat(results[2].getScore(), is(243));
+		Assert.assertThat(results[3].getScore(), is(158));
 
-		Assert.assertThat(lastTurn, is(4574));
+		Assert.assertThat(lastTurn, is(866));
 	}
 }

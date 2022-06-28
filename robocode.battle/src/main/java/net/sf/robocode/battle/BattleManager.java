@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import net.sf.robocode.recording.BattlePlayer;
 import net.sf.robocode.recording.IRecordManager;
 import net.sf.robocode.repository.IRepositoryManager;
 import net.sf.robocode.settings.ISettingsManager;
+import net.sf.robocode.ui.IWindowManager;
 import robocode.Event;
 import robocode.control.BattleSpecification;
 import robocode.control.RandomFactory;
@@ -110,6 +111,15 @@ public class BattleManager implements IBattleManager {
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(spec.getRobots());
 
 		startNewBattleImpl(robots, waitTillOver, enableRecording);
+	}
+
+	@Override
+	public void takeScreenshot() {
+		IWindowManager windowManager = Container.getComponent(IWindowManager.class);
+
+		if (windowManager != null) {
+			windowManager.takeScreenshot();
+		}
 	}
 
 	private void startNewBattleImpl(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableRecording) {

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,7 +56,8 @@ public final class RobotStatics implements IRobotStatics, Serializable {
 	private final int robotIndex;
 	private final int teamIndex;
 
-	public RobotStatics(RobotSpecification robotSpecification, String suffix, boolean isLeader, BattleRules rules, String teamName, List<String> teamMembers, int robotIndex, int teamIndex) {
+	public RobotStatics(RobotSpecification robotSpecification, String name, String suffix, boolean isLeader, BattleRules rules, String teamName,
+			List<String> teamMembers, int robotIndex, int teamIndex) {
 		IRobotItem robotItem = (IRobotItem) HiddenAccess.getFileSpecification(robotSpecification);
 
 		this.robotIndex = robotIndex;
@@ -65,7 +66,7 @@ public final class RobotStatics implements IRobotStatics, Serializable {
 		this.shortClassName = robotItem.getShortClassName();
 		this.fullClassName = robotItem.getFullClassName();
 
-		this.name = robotItem.getUniqueFullClassNameWithVersion() + suffix;
+		this.name = name;
 		this.shortName = robotItem.getUniqueShortClassNameWithVersion() + suffix;
 		this.veryShortName = robotItem.getUniqueVeryShortClassNameWithVersion() + suffix;
 

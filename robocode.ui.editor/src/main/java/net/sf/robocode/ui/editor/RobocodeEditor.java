@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyVetoException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -166,7 +167,7 @@ public class RobocodeEditor extends JFrame implements Runnable, IRobocodeEditor 
 
 		File f = new File(FileUtil.getCwd(), templateName);
 		int size = (int) (f.length());
-		byte buff[] = new byte[size];
+		byte[] buff = new byte[size];
 
 		FileInputStream fis = null;
 		DataInputStream dis = null;
@@ -189,10 +190,10 @@ public class RobocodeEditor extends JFrame implements Runnable, IRobocodeEditor 
 		int index = template.indexOf("$");
 
 		while (index >= 0) {
-			if (template.substring(index, index + 10).equals("$CLASSNAME")) {
+			if (template.startsWith("$CLASSNAME", index)) {
 				template = template.substring(0, index) + name + template.substring(index + 10);
 				index += name.length();
-			} else if (template.substring(index, index + 8).equals("$PACKAGE")) {
+			} else if (template.startsWith("$PACKAGE", index)) {
 				template = template.substring(0, index) + packageName + template.substring(index + 8);
 				index += packageName.length();
 			} else {
@@ -389,7 +390,7 @@ public class RobocodeEditor extends JFrame implements Runnable, IRobocodeEditor 
 
 		File f = new File(FileUtil.getCwd(), templateName);
 		int size = (int) (f.length());
-		byte buff[] = new byte[size];
+		byte[] buff = new byte[size];
 		FileInputStream fis = null;
 		DataInputStream dis = null;
 
@@ -408,10 +409,10 @@ public class RobocodeEditor extends JFrame implements Runnable, IRobocodeEditor 
 		int index = template.indexOf("$");
 
 		while (index >= 0) {
-			if (template.substring(index, index + 10).equals("$CLASSNAME")) {
+			if (template.startsWith("$CLASSNAME", index)) {
 				template = template.substring(0, index) + name + template.substring(index + 10);
 				index += name.length();
-			} else if (template.substring(index, index + 8).equals("$PACKAGE")) {
+			} else if (template.startsWith("$PACKAGE", index)) {
 				template = template.substring(0, index) + packageName + template.substring(index + 8);
 				index += packageName.length();
 			} else {
@@ -596,7 +597,7 @@ public class RobocodeEditor extends JFrame implements Runnable, IRobocodeEditor 
 
 			try {
 				fileInputStream = new FileInputStream(robotFilename);
-				inputStreamReader = new InputStreamReader(fileInputStream, "UTF8");
+				inputStreamReader = new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
 				bufferedReader = new BufferedReader(inputStreamReader);
 
 				EditWindow editWindow = new EditWindow(repositoryManager, this, robotsDirectory);

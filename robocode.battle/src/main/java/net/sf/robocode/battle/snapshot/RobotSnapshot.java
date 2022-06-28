@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import net.sf.robocode.serialization.*;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.IScoreSnapshot;
 import robocode.control.snapshot.RobotState;
+import robocode.util.Utils;
 
 import java.awt.geom.Arc2D;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import java.util.Map;
  *
  * @since 1.6.1
  */
-public final class RobotSnapshot implements Serializable, IXmlSerializable, ICsvSerializable, IRobotSnapshot {
+public final class RobotSnapshot implements Serializable, IXmlSerializable, IRobotSnapshot {
 
 	private static final long serialVersionUID = 2L;
 
@@ -186,7 +187,9 @@ public final class RobotSnapshot implements Serializable, IXmlSerializable, ICsv
 
 	@Override
 	public String toString() {
-		return shortName + " (" + (int) energy + ") X" + (int) x + " Y" + (int) y + " " + state.toString();
+		return shortName + " (" + (int) energy + ") X" + (int) x + " Y" + (int) y
+				+ " ~" + Utils.angleToApproximateDirection(bodyHeading)
+				+ " " + state.toString();
 	}
 
 	/**
@@ -502,21 +505,6 @@ public final class RobotSnapshot implements Serializable, IXmlSerializable, ICsv
 		}
 		writer.endElement();
 
-	}
-
-	@Override
-	public void writeCsv(CsvWriter writer, SerializableOptions options) throws IOException {
-		writer.writeValue(robotIndex);
-		writer.writeValue(name);
-		writer.writeValue(energy, options.trimPrecision);
-		writer.writeValue(x, options.trimPrecision);
-		writer.writeValue(y, options.trimPrecision);
-		writer.writeValue(bodyHeading, options.trimPrecision);
-		writer.writeValue(gunHeading, options.trimPrecision);
-		writer.writeValue(radarHeading, options.trimPrecision);
-		writer.writeValue(gunHeat, options.trimPrecision);
-		writer.writeValue(velocity, options.trimPrecision);
-		((ScoreSnapshot) robotScoreSnapshot).writeCsv(writer, options);
 	}
 
 	// allows loading of minimalistic XML

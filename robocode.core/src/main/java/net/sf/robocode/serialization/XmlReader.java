@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import java.util.Stack;
  */
 public class XmlReader {
 
-	private SAXParser parser;
+	private final SAXParser parser;
 
 	private final InputStream input;
 	private final Stack<Element> elements = new Stack<Element>();
@@ -35,7 +35,7 @@ public class XmlReader {
 	private final Stack<Map<String, Element>> elementNames = new Stack<Map<String, Element>>();
 	private final Stack<Map<String, Attribute>> attributeNames = new Stack<Map<String, Attribute>>();
 	private IXmlSerializable result;
-	private Map<String, Object> context = new HashMap<String, Object>();
+	private final Map<String, Object> context = new HashMap<String, Object>();
 
 	private XmlReader(InputStream input) throws SAXException, ParserConfigurationException {
 		this.input = input;

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,7 @@ public class RobocodeEngine implements IRobocodeEngine {
 
 	private BattleObserver battleObserver;
 	private BattleSpecification battleSpecification;
-	private List<IBattleListener> listeners = new ArrayList<IBattleListener>();
+	private final List<IBattleListener> listeners = new ArrayList<IBattleListener>();
 
 	/**
 	 * Creates a new RobocodeEngine for controlling Robocode.
@@ -279,6 +279,20 @@ public class RobocodeEngine implements IRobocodeEngine {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public void abortCurrentBattle(boolean waitTillEnd) {
+		ContainerBase.getComponent(IBattleManagerBase.class).stop(waitTillEnd);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void takeScreenshot() {
+		ContainerBase.getComponent(IBattleManagerBase.class).takeScreenshot();
+	}
+
+	/**
 	 * Prints out all running threads to standard system out.
 	 *
 	 * @since 1.6.2
@@ -294,8 +308,8 @@ public class RobocodeEngine implements IRobocodeEngine {
 			currentGroup = currentGroup.getParent();
 		}
 
-		ThreadGroup groups[] = new ThreadGroup[256];
-		Thread threads[] = new Thread[256];
+		ThreadGroup[] groups = new ThreadGroup[256];
+		Thread[] threads = new Thread[256];
 
 		int numGroups = currentGroup.enumerate(groups, true);
 

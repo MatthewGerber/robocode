@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import robocode.*;
  * @author Flemming N. Larsen (original)
  */
 public class ThreadGroupAttack extends Robot {
-	private Thread[] threads = new Thread[100];
+	private final Thread[] threads = new Thread[100];
 
 	public void run() {
 		runAttack();

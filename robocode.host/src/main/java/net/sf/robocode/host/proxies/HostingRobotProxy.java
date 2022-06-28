@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,8 @@ import net.sf.robocode.host.security.RobotThreadManager;
 import net.sf.robocode.host.*;
 import static net.sf.robocode.io.Logger.logError;
 import static net.sf.robocode.io.Logger.logMessage;
+
+import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.peer.BadBehavior;
 import net.sf.robocode.peer.ExecCommands;
 import net.sf.robocode.peer.IRobotPeer;
@@ -108,6 +110,10 @@ abstract class HostingRobotProxy implements IHostingRobotProxy, IHostedThread {
 
 	public RobotOutputStream getOut() {
 		return out;
+	}
+
+	public IBasicRobot getRobotObject() {
+		return robot;
 	}
 
 	public void println(String s) {
@@ -243,7 +249,11 @@ abstract class HostingRobotProxy implements IHostingRobotProxy, IHostedThread {
 			} catch (Exception e) {
 				drainEnergy();
 				println(e);
-				logMessage(statics.getName() + ": Exception: " + e); // without stack here
+				if (RobocodeProperties.isTestingOn()) {
+					logError(statics.getName() + ": Exception: " + e, e);
+				} else {
+					logMessage(statics.getName() + ": Exception: " + e); // without stack here
+				}
 			} catch (ThreadDeath e) {
 				drainEnergy();
 				println(e);
@@ -252,7 +262,11 @@ abstract class HostingRobotProxy implements IHostingRobotProxy, IHostedThread {
 			} catch (Throwable t) {
 				drainEnergy();
 				println(t);
-				logMessage(statics.getName() + ": Throwable: " + t); // without stack here
+				if (RobocodeProperties.isTestingOn()) {
+					logError(statics.getName() + ": Throwable: " + t, t);
+				} else {
+					logMessage(statics.getName() + ": Throwable: " + t); // without stack here
+				}
 			} finally {
 				waitForBattleEndImpl();
 			}

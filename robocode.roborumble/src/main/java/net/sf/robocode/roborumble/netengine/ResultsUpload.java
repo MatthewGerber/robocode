@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import java.util.Vector;
  *
  * @author Albert Perez (original)
  * @author Flemming N. Larsen (contributor)
+ * @author Pavel Savara (contributor)
  */
 public class ResultsUpload {
 
@@ -31,7 +32,7 @@ public class ResultsUpload {
 	private final String resultsfile;
 	private final String resultsurl;
 	private final String tempdir;
-	private String game;
+	private final String game;
 	private final String user;
 	private final String sizesfile;
 	private final String minibots;
@@ -43,21 +44,15 @@ public class ResultsUpload {
 	private final String teams;
 	private final String melee;
 
-	public ResultsUpload(String propertiesfile, String clientVersion) {
-		// Read parameters
-		Properties parameters = getProperties(propertiesfile);
+	public ResultsUpload(String game, Properties parameters, String clientVersion) {
 
 		resultsfile = parameters.getProperty("OUTPUT", "");
 		resultsurl = parameters.getProperty("RESULTSURL", "");
 		tempdir = parameters.getProperty("TEMP", "");
 		user = parameters.getProperty("USER", "");
-		game = propertiesfile;
+		this.game = game;
 		String botsrepository = parameters.getProperty("BOTSREP", "");
 
-		while (game.indexOf("/") != -1) {
-			game = game.substring(game.indexOf("/") + 1);
-		}
-		game = game.substring(0, game.indexOf("."));
 		sizesfile = parameters.getProperty("CODESIZEFILE", "");
 		minibots = parameters.getProperty("MINIBOTS", "");
 		microbots = parameters.getProperty("MICROBOTS", "");
@@ -248,6 +243,7 @@ public class ResultsUpload {
 		BufferedReader bufferedReader = null;
 
 		try {
+			System.out.println("Uploading results to " + resultsurl + " as " + user);
 			// Send data
 			URLConnection conn = FileTransfer.openOutputURLConnection(new URL(resultsurl));
 

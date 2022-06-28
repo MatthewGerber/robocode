@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -22,6 +22,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
 
 import net.sf.robocode.io.FileUtil;
+import net.sf.robocode.io.Logger;
 
 
 /**
@@ -45,11 +46,13 @@ public class ScreenshotUtil {
 
 		File file = new File(screenshotDir, DATE_FORMAT.format(new Date()) + '.' + format.toLowerCase());
 
+		Logger.logMessage("Saved screenshot to "+file.getAbsolutePath());
+
 		try {
 			// Instantiate an ImageWriteParam object with default compression options
 			Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName(format);
 
-			writer = (ImageWriter) it.next();	
+			writer = it.next();
 			ImageWriteParam iwp = writer.getDefaultWriteParam();
 
 			// If compression is supported, then set the compression mode

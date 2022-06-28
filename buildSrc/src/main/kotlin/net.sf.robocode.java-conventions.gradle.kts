@@ -15,7 +15,7 @@ repositories {
 }
 
 group = "net.sf.robocode"
-version = "1.9.4.0"
+version = "1.9.4.6"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 tasks.withType<JavaCompile>() {
@@ -50,7 +50,7 @@ publishing {
                         name.set("Mathew A. Nelson")
                     }
                     developer {
-                        id.set("fln")
+                        id.set("flemming-n-larsen")
                         name.set("Flemming N. Larsen")
                         email.set("flemming.n.larsen@gmail.com")
                     }

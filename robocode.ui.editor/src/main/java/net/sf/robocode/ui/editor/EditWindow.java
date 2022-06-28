@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 
@@ -283,7 +284,7 @@ public class EditWindow extends JInternalFrame {
 
 		try {
 			fileOutputStream = new FileOutputStream(fileName);
-			outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF8");
+			outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
 			bufferedWriter = new BufferedWriter(outputStreamWriter);
 
 			getEditorPane().write(bufferedWriter);

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,8 @@ package robocode.control.events;
 
 
 import robocode.BattleRules;
+
+import java.util.UUID;
 
 
 /**
@@ -27,6 +29,7 @@ import robocode.BattleRules;
 public class BattleStartedEvent extends BattleEvent {
 	private final BattleRules battleRules;
 	private final boolean isReplay;
+	private final UUID battleId;
 	private final int robotsCount;
 
 	/**
@@ -37,12 +40,14 @@ public class BattleStartedEvent extends BattleEvent {
 	 * @param robotsCount the number of robots participating in the battle.
 	 * @param isReplay a flag specifying if this battle is a replay or real battle:
 	 *                 {@code true} if the battle is a replay; {@code false} otherwise.
+	 * @param battleId unique id of the battle
 	 */
-	public BattleStartedEvent(BattleRules battleRules, int robotsCount, boolean isReplay) {
+	public BattleStartedEvent(BattleRules battleRules, int robotsCount, boolean isReplay, UUID battleId) {
 		super();
 		this.battleRules = battleRules;
 		this.isReplay = isReplay;
 		this.robotsCount = robotsCount;
+		this.battleId = battleId;
 	}
 
 	/**
@@ -70,5 +75,14 @@ public class BattleStartedEvent extends BattleEvent {
 	 */
 	public boolean isReplay() {
 		return isReplay;
+	}
+
+	/**
+	 * Unique ID of the battle
+	 *
+	 * @return Unique ID of the battle
+	 */
+	public UUID getBattleId() {
+		return battleId;
 	}
 }

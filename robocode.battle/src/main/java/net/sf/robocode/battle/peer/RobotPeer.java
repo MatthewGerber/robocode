@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,6 +17,7 @@ import net.sf.robocode.host.events.EventManager;
 import net.sf.robocode.host.events.EventQueue;
 import net.sf.robocode.host.proxies.IHostingRobotProxy;
 import net.sf.robocode.io.Logger;
+import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.peer.*;
 import net.sf.robocode.repository.IRobotItem;
 import net.sf.robocode.security.HiddenAccess;
@@ -30,6 +31,9 @@ import robocode.control.snapshot.RobotState;
 import robocode.exception.AbortedException;
 import robocode.exception.DeathException;
 import robocode.exception.WinException;
+import robocode.robotinterfaces.IBasicRobot;
+import robocode.util.Utils;
+
 import static robocode.util.Utils.*;
 
 import java.awt.geom.Arc2D;
@@ -138,7 +142,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 	private final BoundingRectangle boundingBox;
 	private final RbSerializer rbSerializer;
 
-	public RobotPeer(Battle battle, IHostManager hostManager, RobotSpecification robotSpecification, String suffix, TeamPeer team, int robotIndex) {
+	public RobotPeer(Battle battle, IHostManager hostManager, RobotSpecification robotSpecification, String name, String suffix, TeamPeer team, int robotIndex) {
 		super();
 
 		this.battle = battle;
@@ -172,9 +176,11 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 			teamIndex = team.getTeamIndex();
 		}
 
-		this.statics = new RobotStatics(robotSpecification, suffix, isTeamLeader, battleRules, teamName, teamMembers,
+		this.statics = new RobotStatics(robotSpecification, name, suffix, isTeamLeader, battleRules, teamName, teamMembers,
 				robotIndex, teamIndex);
 		this.statistics = new RobotStatistics(this, battle.getRobotsCount());
+
+		this.isPaintEnabled = this.statics.isPaintRobot() && RobocodeProperties.isPaintingOn();
 
 		this.robotProxy = (IHostingRobotProxy) hostManager.createRobotProxy(robotSpecification, statics, this);
 	}
@@ -194,7 +200,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 	public String readOutText() {
 		synchronized (proxyText) {
-			final String robotText = battleText.toString() + proxyText.toString();
+			final String robotText = battleText.toString() + proxyText;
 
 			battleText.setLength(0);
 			proxyText.setLength(0);
@@ -264,6 +270,10 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 	public int getRobotIndex() {
 		return statics.getRobotIndex();
+	}
+
+	public IBasicRobot getRobotObject() {
+		return robotProxy.getRobotObject();
 	}
 
 	public int getTeamIndex() {
@@ -969,9 +979,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 	private boolean checkDispatchToMember(RobotPeer member, String recipient) {
 		if (member.isAlive()) {
 			if (recipient == null) {
-				if (member != this) {
-					return true;
-				}
+				return member != this;
 			} else {
 				final int nl = recipient.length();
 				final String currentName = member.statics.getName();
@@ -982,9 +990,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 				final String currentClassName = member.statics.getFullClassName();
 
-				if ((currentClassName.length() >= nl && currentClassName.substring(0, nl).equals(recipient))) {
-					return true;
-				}
+				return currentClassName.length() >= nl && currentClassName.substring(0, nl).equals(recipient);
 
 			}
 		}
@@ -1060,6 +1066,12 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 	}
 
+	public void updateAfterCollision() {
+		if (state == RobotState.HIT_ROBOT) {
+			updateBoundingBox();
+		}
+	}
+
 	private void checkWallCollision() {
 		int minX = 0 + HALF_WIDTH_OFFSET;
 		int minY = 0 + HALF_HEIGHT_OFFSET;
@@ -1080,7 +1092,8 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 			adjustX = maxX - x;
 			angle = normalRelativeAngle(PI / 2 - bodyHeading);
 
-		} else if (y < minY) {
+		}
+		if (y < minY) {
 			hitWall = true;
 			adjustY = minY - y;
 			angle = normalRelativeAngle(PI - bodyHeading);
@@ -1422,11 +1435,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		// If we are moving normally and the breaking distance is more
 		// than remaining distance, enabled the overdrive flag.
 		if (Math.signum(distance * velocity) != -1) {
-			if (getDistanceTraveledUntilStop(velocity) > Math.abs(distance)) {
-				isOverDriving = true;
-			} else {
-				isOverDriving = false;
-			}
+			isOverDriving = getDistanceTraveledUntilStop(velocity) > Math.abs(distance);
 		}
 
 		currentCommands.setDistanceRemaining(distance - velocity);
@@ -1759,7 +1768,9 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 	@Override
 	public String toString() {
-		return statics.getShortName() + "(" + (int) energy + ") X" + (int) x + " Y" + (int) y + " " + state.toString()
+		return statics.getShortName() + "(" + (int) energy + ") X" + (int) x + " Y" + (int) y
+				+ " ~" + Utils.angleToApproximateDirection(bodyHeading)
+				+ " " + state.toString()
 				+ (isSleeping() ? " sleeping " : "") + (isRunning() ? " running" : "") + (isHalt() ? " halted" : "");
 	}
 }

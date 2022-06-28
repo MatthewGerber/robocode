@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ import javax.swing.text.TabStop;
 @SuppressWarnings("serial")
 public class EditorPane extends JTextPane {
 
-	private int tabSize = 4; // Default
+	private final int tabSize = 4; // Default
 
 	// Key bindings
 	private static final KeyStroke CUT_KEYSTROKE = KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK);
@@ -58,7 +58,7 @@ public class EditorPane extends JTextPane {
 
 	private final TextTool textTool = new TextTool();
 
-	private JViewport viewport;
+	private final JViewport viewport;
 
 	public EditorPane(JViewport viewport) {
 		super();
@@ -252,7 +252,7 @@ public class EditorPane extends JTextPane {
 						stopUnindent = true;
 						break;
 					} else {
-						newText.append(line.substring(1, line.length()));
+						newText.append(line.substring(1));
 						count++;
 					}
 				} else {

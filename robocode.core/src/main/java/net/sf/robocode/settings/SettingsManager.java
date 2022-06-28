@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import java.util.List;
  * @author Flemming N. Larsen (contributor)
  * @author Nathaniel Troutman (contributor)
  */
-// TODO ZAMO, refactor, split by modules
 public class SettingsManager implements ISettingsManager {
 	// Default SFX files
 	private final static String
@@ -721,7 +720,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));
 
-		optionsBattleDesiredTPS = Integer.parseInt(props.getProperty(OPTIONS_BATTLE_DESIREDTPS, "30"));
+		optionsBattleDesiredTPS = Integer.parseInt(System.getProperty(OPTIONS_BATTLE_DESIREDTPS, props.getProperty(OPTIONS_BATTLE_DESIREDTPS, "30")));
 
 		// set methods are used here in order to set the rendering hints, which must be rebuild
 		setOptionsRenderingAntialiasing(Integer.parseInt(props.getProperty(OPTIONS_RENDERING_ANTIALIASING, "0")));

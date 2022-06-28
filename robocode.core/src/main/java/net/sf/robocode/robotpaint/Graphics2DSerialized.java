@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -2023,7 +2023,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		} else {
 			put((byte) 5);
 
-			double coords[] = new double[6];
+			double[] coords = new double[6];
 			int count = 0;
 
 			// count them first

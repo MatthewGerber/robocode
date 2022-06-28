@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public class RobotClassLoader extends URLClassLoader implements IRobotClassLoader {
 
-	static final String UNTRUSTED_URL = "http://robocode.sf.net/untrusted";
+	static final String UNTRUSTED_URL = "https://robocode.sourceforge.io/untrusted";
 
 	private static final PermissionCollection EMPTY_PERMISSIONS = new Permissions();
 
@@ -88,6 +88,13 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 		}
 		if (RobocodeProperties.isSecurityOn()) {
 			testPackages(name);
+		} else {
+			// try if the class is available in parent classLoader
+			Class<?> result = parent.loadClass(name);
+			if (result != null) {
+				// yes, it is in system class path
+				return result;
+			}
 		}
 		if (!name.startsWith("robocode")) {
 			Class<?> result = loadRobotClassLocaly(name, resolve);
@@ -100,7 +107,6 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 
 		// it is robot API
 		// or java class
-		// or security is off
 		// so we delegate to parent class loader
 		return parent.loadClass(name);
 	}

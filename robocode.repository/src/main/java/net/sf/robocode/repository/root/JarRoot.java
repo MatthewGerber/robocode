@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,7 +51,7 @@ public final class JarRoot extends BaseRoot implements IRepositoryRoot {
 		String jarPath = null;
 		URL jarUrl = null;
 		try {
-			jarPath = "jar:" + rootPath.toURI().toString();
+			jarPath = "jar:" + rootPath.toURI();
 			jarUrl = new URL(jarPath + "!/");
 		} catch (MalformedURLException e) {
 			Logger.logError(e);

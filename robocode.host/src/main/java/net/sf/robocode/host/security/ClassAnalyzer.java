@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,7 +65,7 @@ public final class ClassAnalyzer {
 		for (Integer classNameIndex : classNameIndexes) {
 			String className = info.utf8s[classNameIndex].replace('\\', '.').replace('/', '.');
 
-			if (className.indexOf("[") != 0 && !collection.contains(className)) {
+			if (className.indexOf("[") != 0) {
 				collection.add(className);
 			}
 		}

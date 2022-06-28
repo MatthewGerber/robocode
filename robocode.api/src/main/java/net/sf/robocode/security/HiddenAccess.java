@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,6 +29,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 
@@ -128,7 +129,7 @@ public class HiddenAccess {
 		String path = HiddenAccess.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
 		try {
-			path = URLDecoder.decode(path, "UCS2");
+			path = URLDecoder.decode(path, StandardCharsets.UTF_8.toString());
 		} catch (UnsupportedEncodingException e) {
 			path = new File(".", "libs/robocode.jar").toString();
 		}
@@ -176,7 +177,7 @@ public class HiddenAccess {
 					urls.add(url);
 				}
 				classPath.append(File.pathSeparator);
-				classPath.append(file.toString());
+				classPath.append(file);
 			}
 		}
 		return new URLClassLoader(urls.toArray(new URL[urls.size()]), loader);

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@ package net.sf.robocode.test.host.security;
 import net.sf.robocode.core.Container;
 import net.sf.robocode.core.EngineClassLoader;
 import net.sf.robocode.host.security.RobotClassLoader;
+import net.sf.robocode.io.Logger;
 import net.sf.robocode.security.HiddenAccess;
 import net.sf.robocode.test.helpers.RobocodeTestBed;
 import org.junit.Assert;
@@ -34,7 +35,14 @@ public class RobotClassLoaderTest {
 	@BeforeClass
 	public static void init() throws IOException {
 		HiddenAccess.initContainer();
-		robotsPath = RobocodeTestBed.init();
+		try {
+			File robotsPathFile = new File("../.sandbox/robots").getCanonicalFile().getAbsoluteFile();
+			robotsPath = robotsPathFile.getPath();
+		} catch (IOException e) {
+			e.printStackTrace(Logger.realErr);
+			throw new Error(e);
+		}
+		System.setProperty("ROBOTPATH", robotsPath);
 		classPath = new File(robotsPath).getCanonicalFile().toURI().toURL();
 	}
 

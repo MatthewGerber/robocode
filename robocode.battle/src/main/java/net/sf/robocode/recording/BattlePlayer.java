@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public final class BattlePlayer extends BaseBattle {
 
 		battleRules = recordManager.recordInfo.battleRules;
 		paint = new boolean[recordManager.recordInfo.robotCount];
-		eventDispatcher.onBattleStarted(new BattleStartedEvent(battleRules, recordManager.recordInfo.robotCount, true));
+		eventDispatcher.onBattleStarted(new BattleStartedEvent(battleRules, recordManager.recordInfo.robotCount, true, recordManager.recordInfo.battleId));
 		if (isPaused) {
 			eventDispatcher.onBattlePaused(new BattlePausedEvent());
 		}
@@ -72,10 +72,10 @@ public final class BattlePlayer extends BaseBattle {
 	protected void initializeRound() {
 		super.initializeRound();
 
-		final ITurnSnapshot snapshot = recordManager.readSnapshot(currentTime);
+		final ITurnSnapshot snapshot = recordManager.readSnapshot();
 
 		if (snapshot != null) {
-			eventDispatcher.onRoundStarted(new RoundStartedEvent(snapshot, getRoundNum()));
+			eventDispatcher.onRoundStarted(new RoundStartedEvent(snapshot, getRoundNum(), null));
 		}
 	}
 
@@ -95,7 +95,7 @@ public final class BattlePlayer extends BaseBattle {
 
 	@Override
 	protected void finalizeTurn() {
-		final ITurnSnapshot snapshot = recordManager.readSnapshot(currentTime);
+		final ITurnSnapshot snapshot = recordManager.readSnapshot();
 
 		if (snapshot != null) {
 			final IRobotSnapshot[] robots = snapshot.getRobots();

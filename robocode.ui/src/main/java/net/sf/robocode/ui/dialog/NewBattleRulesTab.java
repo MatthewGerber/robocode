@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private final EventHandler eventHandler = new EventHandler();
 
-	private SizeButton[] predefinedSizeButtons = {
+	private final SizeButton[] predefinedSizeButtons = {
 		new SizeButton(400, 400), new SizeButton(600, 400), new SizeButton(600, 600), new SizeButton(800, 600),
 		new SizeButton(800, 800), new SizeButton(1000, 800), new SizeButton(1000, 1000), new SizeButton(1200, 1200),
 		new SizeButton(2000, 2000), new SizeButton(5000, 5000)

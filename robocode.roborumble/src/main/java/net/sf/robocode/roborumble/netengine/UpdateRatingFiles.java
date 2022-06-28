@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,10 +24,11 @@ import java.util.Vector;
  *
  * @author Albert Perez (original)
  * @author Flemming N. Larsen (contributor)
+ * @author Pavel Savara (contributor)
  */
 public class UpdateRatingFiles {
 
-	private String game;
+	private final String game;
 	private final String minibots;
 	private final String microbots;
 	private final String nanobots;
@@ -37,15 +38,8 @@ public class UpdateRatingFiles {
 	private final String microratings;
 	private final String nanoratings;
 
-	public UpdateRatingFiles(String propertiesfile) {
-		// Read parameters
-		Properties parameters = getProperties(propertiesfile);
-
-		game = propertiesfile;
-		while (game.indexOf("/") != -1) {
-			game = game.substring(game.indexOf("/") + 1);
-		}
-		game = game.substring(0, game.indexOf("."));
+	public UpdateRatingFiles(String game, Properties parameters) {
+		this.game = game;
 		minibots = parameters.getProperty("MINIBOTS", "");
 		microbots = parameters.getProperty("MICROBOTS", "");
 		nanobots = parameters.getProperty("NANOBOTS", "");
@@ -124,7 +118,7 @@ public class UpdateRatingFiles {
 
 		String[] value = values.split(",");
 
-		values = value[0] + "," + Double.toString(battles) + "," + value[2];
+		values = value[0] + "," + battles + "," + value[2];
 		ratings.setProperty(bot, values);
 	}
 }

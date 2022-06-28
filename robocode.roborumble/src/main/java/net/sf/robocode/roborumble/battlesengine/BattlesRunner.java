@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,7 +9,6 @@ package net.sf.robocode.roborumble.battlesengine;
 
 
 import net.sf.robocode.io.Logger;
-import static net.sf.robocode.roborumble.util.PropertiesUtil.getProperties;
 import robocode.control.*;
 import robocode.control.events.BattleAdaptor;
 import robocode.control.events.BattleCompletedEvent;
@@ -27,6 +26,7 @@ import java.util.*;
  * @author Albert Perez (original)
  * @author Flemming N. Larsen (contributor)
  * @author Joachim Hofer (contributor)
+ * @author Pavel Savara (contributor)
  */
 public class BattlesRunner {
 	private final BattlesFile inputfile;
@@ -35,13 +35,11 @@ public class BattlesRunner {
 	private final int fieldhei;
 	private final String outfile;
 	private final String user;
-	private String game;
+	private final String game;
 	private static RobotResults[] lastResults;
 	private static IRobocodeEngine engine;
 
-	public BattlesRunner(String propertiesfile) {
-		// Read parameters
-		Properties parameters = getProperties(propertiesfile);
+	public BattlesRunner(String game, Properties parameters) {
 
 		inputfile = new BattlesFile(parameters.getProperty("INPUT", ""));
 		numrounds = Integer.parseInt(parameters.getProperty("ROUNDS", "10"));
@@ -49,12 +47,7 @@ public class BattlesRunner {
 		fieldhei = Integer.parseInt(parameters.getProperty("FIELDH", "600"));
 		outfile = parameters.getProperty("OUTPUT", "");
 		user = parameters.getProperty("USER", "");
-
-		game = propertiesfile;
-		while (game.indexOf("/") != -1) {
-			game = game.substring(game.indexOf("/") + 1);
-		}
-		game = game.substring(0, game.indexOf("."));
+		this.game = game;
 
 		initialize();
 	}

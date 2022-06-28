@@ -39,7 +39,7 @@ tasks {
             from({
                 configurations.runtimeClasspath.get().filter {
                     it.name.endsWith("jar") && !it.name.contains("eclipse") && !it.name.contains("robocode.samples") && !it.name.contains(
-                        "robocode.content"
+                            "robocode.content"
                     )
                 }.map { it }
             })
@@ -47,15 +47,15 @@ tasks {
         into("compilers") {
             from({
                 configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") && it.name.contains("eclipse") }
-                    .map { it }
+                        .map { it }
             })
         }
         into("robots") {
             from({
                 configurations.runtimeClasspath.get()
-                    .filter { it.name.endsWith("jar") && it.name.contains("robocode.samples") }.map {
-                        zipTree(it)
-                    }
+                        .filter { it.name.endsWith("jar") && it.name.contains("robocode.samples") }.map {
+                            zipTree(it)
+                        }
             }) {
                 exclude("META-INF")
                 exclude("META-INF/**")
@@ -64,13 +64,61 @@ tasks {
         into("") {
             from({
                 configurations.runtimeClasspath.get()
-                    .filter { it.name.endsWith("jar") && it.name.contains("robocode.content") }.map {
-                        zipTree(it)
-                    }
+                        .filter { it.name.endsWith("jar") && it.name.contains("robocode.content") }.map {
+                            zipTree(it)
+                        }
             })
             from("../versions.md")
         }
     }
+
+    task<Exec>("dockerBuild") {
+        dependsOn("jar")
+        workingDir = file("../")
+        commandLine("docker", "build", "-t", "zamboch/roborumble:${project.version}", "-t", "zamboch/roborumble:latest", ".")
+    }
+
+    task<Exec>("dockerPush") {
+        dependsOn("dockerBuild")
+        workingDir = file("../")
+        commandLine("docker", "push", "zamboch/roborumble", "--all-tags")
+    }
+
+    task<Delete>("chocoClean") {
+        delete("build/choco")
+    }
+
+    task<Copy>("chocoCopy") {
+        dependsOn("chocoClean")
+        dependsOn("jar")
+        from("../build/") {
+            include("robocode-${project.version}-setup.jar")
+            include("robocode-${project.version}-setup.jar.asc")
+            into("tools")
+        }
+        from("src/chocolatey/") {
+            include("**")
+        }
+        into("build/choco")
+    }
+
+    task<Exec>("chocoBuild") {
+        dependsOn("chocoCopy")
+        workingDir = file("build/choco")
+        commandLine("choco", "pack", "--version", "${project.version}")
+    }
+
+    task<Exec>("chocoPush") {
+        dependsOn("chocoBuild")
+        workingDir = file("build/choco")
+        commandLine("choco", "push", "robocode.${project.version}.nupkg", "-s", "https://push.chocolatey.org/")
+    }
+
+    build {
+        // dependsOn("chocoBuild")
+        // dependsOn("dockerBuild")
+    }
+
     publishMavenJavaPublicationToSonatypeRepository {
         enabled = false
     }

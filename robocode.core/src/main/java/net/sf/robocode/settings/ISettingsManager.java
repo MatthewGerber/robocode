@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -244,7 +244,7 @@ public interface ISettingsManager {
 
 	void removePropertyListener(ISettingsListener propertyListener);
 
-	public final static String
+	String
 			OPTIONS_VIEW_ROBOTNAMES = "robocode.options.view.robotNames",
 			OPTIONS_VIEW_SCANARCS = "robocode.options.view.scanArcs",
 			OPTIONS_VIEW_ROBOTENERGY = "robocode.options.view.robotEnergy",

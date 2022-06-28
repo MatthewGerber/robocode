@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -127,7 +127,7 @@ public class Corners extends Robot {
 		}
 
 		// If 75% of the robots are still alive when we die, we'll switch corners.
-		if ((others - getOthers()) / (double) others < .75) {
+		if (getOthers() / (double) others >= .75) {
 			corner += 90;
 			if (corner == 270) {
 				corner = -90;

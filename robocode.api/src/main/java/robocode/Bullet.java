@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@ package robocode;
 import net.sf.robocode.security.IHiddenBulletHelper;
 import net.sf.robocode.serialization.ISerializableHelper;
 import net.sf.robocode.serialization.RbSerializer;
+import robocode.util.Utils;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -73,6 +74,7 @@ public class Bullet implements Serializable {
 		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
+		// bulletId is unique to single round and robot owner
 		return bulletId == ((Bullet) obj).bulletId;
 	}
 
@@ -257,5 +259,12 @@ public class Bullet implements Serializable {
 
 			return new Bullet(headingRadians, x, y, power, ownerName, victimName, isActive, bulletId);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return ownerName + "-" + bulletId + " (" + (int) power + ") X" + (int) x + " Y" + (int) y
+				+ " ~" + Utils.angleToApproximateDirection(headingRadians)
+				+ " " + victimName;
 	}
 }

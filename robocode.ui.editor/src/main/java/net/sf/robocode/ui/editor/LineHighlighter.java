@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -95,7 +95,7 @@ public final class LineHighlighter {
 		} catch (BadLocationException ignore) {}
 	}
 
-	private static CaretListener caretListener = new CaretListener() {
+	private static final CaretListener caretListener = new CaretListener() {
 		@Override
 		public void caretUpdate(CaretEvent e) {
 			JTextComponent c = (JTextComponent) e.getSource();
@@ -103,7 +103,7 @@ public final class LineHighlighter {
 		}
 	};
 
-	private static MouseListener mouseListener = new MouseAdapter() {
+	private static final MouseListener mouseListener = new MouseAdapter() {
 		// highlight the line the user clicks on
 		@Override
 		public void mousePressed(MouseEvent e) {
@@ -112,7 +112,7 @@ public final class LineHighlighter {
 		}
 	};
 
-	private static MouseMotionListener mouseMotionListener = new MouseMotionAdapter() {
+	private static final MouseMotionListener mouseMotionListener = new MouseMotionAdapter() {
 		@Override
 		public void mouseDragged(MouseEvent e) {
 			JTextComponent c = (JTextComponent) e.getSource();
@@ -120,7 +120,7 @@ public final class LineHighlighter {
 		}
 	};
 
-	private static EditorThemePropertyChangeAdapter editorThemePropertyChangeListener = new EditorThemePropertyChangeAdapter() {
+	private static final EditorThemePropertyChangeAdapter editorThemePropertyChangeListener = new EditorThemePropertyChangeAdapter() {
 		public void onHighlightedLineColorChanged(Color newColor) {
 			if (!color.equals(newColor)) {
 				color = newColor;
@@ -128,7 +128,7 @@ public final class LineHighlighter {
 		}
 	};
 
-	private static Highlighter.HighlightPainter painter = new Highlighter.HighlightPainter() {
+	private static final Highlighter.HighlightPainter painter = new Highlighter.HighlightPainter() {
 		@Override
 		public void paint(Graphics g, int p0, int p1, Shape bounds, JTextComponent c) {
 			try {

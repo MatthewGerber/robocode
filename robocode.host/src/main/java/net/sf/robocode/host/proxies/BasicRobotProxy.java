@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2001-2020 Mathew A. Nelson and Robocode contributors
+/*
+ * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,7 +52,7 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 	private ExecResults execResults;
 
 	private final Map<Integer, Bullet> bullets = new ConcurrentHashMap<Integer, Bullet>();
-	private int nextBulletId = 1; // 0 is used for bullet explosions 
+	private int nextBulletId; // 0 is used for bullet explosions
 
 	private final AtomicInteger setCallCount = new AtomicInteger(0);
 	private final AtomicInteger getCallCount = new AtomicInteger(0);
@@ -84,6 +84,9 @@ public class BasicRobotProxy extends HostingRobotProxy implements IBasicRobotPee
 
 		setSetCallCount(0);
 		setGetCallCount(0);
+
+		// make bulletId unique for entire battle and across all robots
+		nextBulletId = 1 + this.statics.getRobotIndex() * 10000 + status.getRoundNum() * 1000000;
 	}
 
 	@Override
