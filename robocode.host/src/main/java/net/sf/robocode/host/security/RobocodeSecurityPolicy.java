@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,6 @@ import net.sf.robocode.host.IHostedThread;
 import net.sf.robocode.host.IThreadManager;
 import net.sf.robocode.host.io.RobotFileSystemManager;
 import net.sf.robocode.io.Logger;
-import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.repository.IRepositoryManager;
 
 import java.io.File;
@@ -34,21 +33,20 @@ import java.util.*;
  * @author Pavel Savara (contributor)
  */
 public class RobocodeSecurityPolicy extends Policy {
-	private static final boolean isFileReadSecutityOff = System.getProperty("OVERRIDEFILEREADSECURITY", "false").equals(
+	private static final boolean isFileReadSecurityOff = System.getProperty("OVERRIDEFILEREADSECURITY", "false").equals(
 			"true");
 	private static final boolean isExperimental = System.getProperty("EXPERIMENTAL", "false").equals("true");
-	private final Set<String> allowedPackages = new HashSet<String>();
+	private final Set<String> allowedPackages = new HashSet<>();
 
 	private final Policy parentPolicy;
-	private final PermissionCollection allPermissions;
 	private Set<String> untrustedCodeUrls;
 
 	private final IThreadManager threadManager;
 
 	public RobocodeSecurityPolicy(IThreadManager threadManager) {
 		this.parentPolicy = Policy.getPolicy();
-		this.allPermissions = new Permissions();
-		this.allPermissions.add(new AllPermission());
+		PermissionCollection allPermissions = new Permissions();
+		allPermissions.add(new AllPermission());
 		this.threadManager = threadManager;
 
 		allowedPackages.add("robocode.util");
@@ -61,9 +59,7 @@ public class RobocodeSecurityPolicy extends Policy {
 
 		initUrls();
 
-		if (RobocodeProperties.isSecurityOn()) {
-			Policy.setPolicy(this);			
-		}
+		Policy.setPolicy(this);
 	}
 
 	@Override
@@ -73,39 +69,24 @@ public class RobocodeSecurityPolicy extends Policy {
 
 	@Override
 	public PermissionCollection getPermissions(final CodeSource codeSource) {
-		if (RobocodeProperties.isSecurityOff()) {
-			return allPermissions;
-		}
-
 		final String source = codeSource.getLocation().toString();
 
 		if (untrustedCodeUrls.contains(source)) {
 			return new Permissions();
 		}
 
-		return AccessController.doPrivileged(new PrivilegedAction<PermissionCollection>() {
-			public PermissionCollection run() {
-				return parentPolicy.getPermissions(codeSource);
-			}
-		});
+		return AccessController.doPrivileged((PrivilegedAction<PermissionCollection>) () -> parentPolicy.getPermissions(codeSource));
 	}
 
 	@Override
 	public boolean implies(ProtectionDomain domain, final Permission permission) {
-		if (RobocodeProperties.isSecurityOff()) {
-			return true;
-		}
 		final String source = domain.getCodeSource().getLocation().toString();
 
 		if (!untrustedCodeUrls.contains(source)) {
 			return true;
 		}
 
-		return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
-			public Boolean run() {
-				return impliesRobot(permission);
-			}
-		});
+		return AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> impliesRobot(permission));
 	}
 
 	private boolean impliesRobot(Permission perm) {
@@ -113,7 +94,7 @@ public class RobocodeSecurityPolicy extends Policy {
 		final String actions = perm.getActions();
 		final String name = perm.getName();
 
-		if (perm instanceof FilePermission && actions.equals("read") && isFileReadSecutityOff) {
+		if (perm instanceof FilePermission && actions.equals("read") && isFileReadSecurityOff) {
 			return true;
 		}
 
@@ -305,7 +286,7 @@ public class RobocodeSecurityPolicy extends Policy {
 	}
 
 	private void initUrls() {
-		untrustedCodeUrls = new HashSet<String>();
+		untrustedCodeUrls = new HashSet<>();
 		untrustedCodeUrls.add(RobotClassLoader.UNTRUSTED_URL);
 
 		String classPath = System.getProperty("robocode.class.path");
@@ -314,7 +295,7 @@ public class RobocodeSecurityPolicy extends Policy {
 		// TODO load URLs from new repository roots, don't forget about all robot .jar files 
 		// TODO or check it directly against repository ?
 		try {
-			final List<String> robots = new ArrayList<String>();
+			final List<String> robots = new ArrayList<>();
 			IRepositoryManager repositoryManager = Container.getComponent(IRepositoryManager.class);
 
 			if (repositoryManager != null) {
@@ -331,8 +312,6 @@ public class RobocodeSecurityPolicy extends Policy {
 					untrustedCodeUrls.add(u);
 				}
 			}
-		} catch (MalformedURLException e) {
-			Logger.logError(e);
 		} catch (IOException e) {
 			Logger.logError(e);
 		}

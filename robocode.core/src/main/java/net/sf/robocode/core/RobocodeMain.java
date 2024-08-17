@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,7 @@ import java.io.PrintStream;
 
 /**
  * Robocode - A programming game involving battling AI tanks.<br>
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  *
  * @see <a target="_top" href="https://robocode.sourceforge.io">robocode.sourceforge.net</a>
  *
@@ -173,19 +173,6 @@ public final class RobocodeMain extends RobocodeMainBase {
 	}
 
 	public void loadSetup(String[] args) {
-
-		final String nosecMessage = "Robocode is running without a security manager.\n"
-				+ "Robots have full access to your system.\n" + "You should only run robots which you trust!";
-		final String exMessage = "Robocode is running in experimental mode.\n"
-				+ "Robots have access to their IRobotPeer interfaces.\n" + "You should only run robots which you trust!";
-
-		if (RobocodeProperties.isSecurityOff()) {
-			Logger.logWarning(nosecMessage);
-		}
-		if (System.getProperty("EXPERIMENTAL", "false").equals("true")) {
-			Logger.logWarning(exMessage);
-		}
-
 		setup.tps = properties.getOptionsBattleDesiredTPS();
 
 		if (GraphicsEnvironment.isHeadless()) {
@@ -200,7 +187,9 @@ public final class RobocodeMain extends RobocodeMainBase {
 
 		// Disable canonical file path cache under Windows as it causes trouble when returning
 		// paths with differently-capitalized file names.
-		if (System.getProperty("os.name").toLowerCase().startsWith("windows ")) {
+		String osName = System.getProperty("os.name").toLowerCase();
+		boolean isWindows = osName.startsWith("windows ");
+		if (isWindows) {
 			System.setProperty("sun.io.useCanonCaches", "false");
 		}
 
@@ -211,11 +200,14 @@ public final class RobocodeMain extends RobocodeMainBase {
 		// http://java.sun.com/developer/technicalArticles/J2SE/Desktop/headless/
 		System.setProperty("java.awt.headless", "false");
 
-		// Set UI scale to 1 for HiDPI if no UI scale has been set from the command line
-		// This way HiDPI will not affect Robocode, as 1x1 pixel is not affected by HiDPI scaling
-		if (System.getProperty("sun.java2d.uiScale") == null) {
-			System.setProperty("sun.java2d.uiScale", "1");
-		}
+		// Fix issue with rendering issues on Windows and Linux, by disabling Direct3D/DirectDraw and enabling
+		// OpenGL acceleration per default
+//		boolean isMac = osName.startsWith("mac ");
+//		if (!isMac) {
+//			System.setProperty("sun.java2d.d3d", "false");
+//			System.setProperty("sun.java2d.noddraw", "true");
+//			System.setProperty("sun.java2d.opengl", "True"); // `True` writes a message about OpenGL acceleration in console
+//		}
 
 		for (int i = 0; i < args.length; i++) {
 			String currentArg = args[i];
@@ -268,7 +260,6 @@ public final class RobocodeMain extends RobocodeMainBase {
 			}
 		}
 		File robotsDir = FileUtil.getRobotsDir();
-
 		if (robotsDir == null) {
 			System.err.println("No valid robot directory is specified");
 			System.exit(8);
@@ -283,6 +274,20 @@ public final class RobocodeMain extends RobocodeMainBase {
 		// Read more about headless mode here:
 		// http://java.sun.com/developer/technicalArticles/J2SE/Desktop/headless/
 		Toolkit.getDefaultToolkit();
+
+		final String nosecMessage = "Robocode is running without a security manager.\n"
+				+ "  Robots have full access to your system.\n" + "  You should only run robots which you trust!";
+		final String exMessage = "Robocode is running in experimental mode.\n"
+				+ "  Robots have access to their IRobotPeer interfaces.\n" + "  You should only run robots which you trust!";
+
+		if (RobocodeProperties.isSecurityOff()) {
+			System.out.println("Warning: " + nosecMessage); // beside the log
+			Logger.logWarning(nosecMessage);
+		}
+		if (System.getProperty("EXPERIMENTAL", "false").equals("true")) {
+			System.out.println("Warning: " + exMessage); // beside the log
+			Logger.logWarning(exMessage);
+		}
 	}
 
 	private void changeDirectory(String robocodeDir) {

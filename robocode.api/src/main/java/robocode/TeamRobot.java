@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,7 @@ import java.util.Vector;
  * that is a Java property file. The filename must be the name of the team
  * like e.g. {@code MyFirstTeam.team}. And the .team file and team robots must
  * exist in the same folder (package name). But you can let the Robocode UI
- * help you create the team from the menu: Robot -&lt; 'Create a robot team'.
+ * help you create the team from the menu: Robot -&gt; 'Create a robot team'.
  * <p>
  * The .team file contains a comma-separated list of the full name of the team
  * members:

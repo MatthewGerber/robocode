@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@ package net.sf.robocode.host.security;
 
 import net.sf.robocode.host.IHostedThread;
 import net.sf.robocode.host.IThreadManager;
-import net.sf.robocode.io.RobocodeProperties;
 
 import java.net.SocketPermission;
 import java.security.AccessControlException;
@@ -39,17 +38,11 @@ public class RobocodeSecurityManager extends SecurityManager {
 		}
 		// We need to exercise it in order to load all used classes on this thread
 		isSafeThread(Thread.currentThread());
-		if (RobocodeProperties.isSecurityOn()) {
-			System.setSecurityManager(this);
-		}
+		System.setSecurityManager(this);
 	}
 
 	@Override
 	public void checkAccess(Thread t) {
-		if (RobocodeProperties.isSecurityOff()) {
-			return;
-		}
-
 		Thread c = Thread.currentThread();
 		if (isSafeThread(c)) {
 			return;
@@ -91,9 +84,6 @@ public class RobocodeSecurityManager extends SecurityManager {
 
 	@Override
 	public void checkAccess(ThreadGroup g) {
-		if (RobocodeProperties.isSecurityOff()) {
-			return;
-		}
 		Thread c = Thread.currentThread();
 		if (isSafeThread(c)) {
 			return;
@@ -128,12 +118,16 @@ public class RobocodeSecurityManager extends SecurityManager {
 	}
 	
     public void checkPermission(Permission perm) {
-		if (RobocodeProperties.isSecurityOff()) {
-			return;
-		}
 		Thread c = Thread.currentThread();
 		if (isSafeThread(c)) {
 			return;
+		}
+		if (perm instanceof RuntimePermission) { // Check if System.getenv is called
+			RuntimePermission runtimePermission = (RuntimePermission) perm;
+			final String name = runtimePermission.getName();
+			if (name != null && name.startsWith("getenv.")) {
+				return;
+			}
 		}
         super.checkPermission(perm);
 

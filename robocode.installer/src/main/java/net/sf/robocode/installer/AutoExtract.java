@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -338,6 +338,13 @@ public class AutoExtract implements ActionListener {
             isSilent = true;
         }
 
+        if (!isSilent) {
+            // Fix issue with rendering issues on Windows
+            System.setProperty("sun.java2d.noddraw", "true"); // disable DirectDraw -> all operations are performed with GDI
+            System.setProperty("sun.java2d.d3d", "false");    // disable the Direct3D pipeline
+            System.setProperty("sun.java2d.opengl", "false"); // disable the OpenGL pipeline
+        }
+
         String message;
 
         if (install(new File(suggestedDirName))) {
@@ -346,7 +353,7 @@ public class AutoExtract implements ActionListener {
             message = "Installation cancelled";
         }
 
-        // Delete the class file with the installer and it's parent folders in the robocode home dir
+        // Delete the class file with the installer, and it's parent folders in the robocode home dir
         if (installDir != null) {
             String installerPath = AutoExtract.class.getName().replaceAll("\\.", "/") + "$1.class";
 

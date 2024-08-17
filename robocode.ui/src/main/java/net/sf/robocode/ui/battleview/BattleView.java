@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2022 Mathew A. Nelson and Robocode contributors
+ * Copyright (c) 2001-2023 Mathew A. Nelson and Robocode contributors
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -98,6 +98,7 @@ public class BattleView extends Canvas {
 
 	private final GraphicsState graphicsState = new GraphicsState();
 	private IGraphicsProxy[] robotGraphics;
+	private AffineTransform identityTx = new AffineTransform();
 
 	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager) {
 		this.properties = properties;
@@ -133,6 +134,8 @@ public class BattleView extends Canvas {
 
 	@Override
 	public void paint(Graphics g) {
+		identityTx = ((Graphics2D) g).getTransform();
+
 		final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
 		if (lastSnapshot != null) {
 			update(lastSnapshot);
@@ -142,12 +145,15 @@ public class BattleView extends Canvas {
 	}
 
 	public BufferedImage getScreenshot() {
-		BufferedImage screenshot = getGraphicsConfiguration().createCompatibleImage(getWidth(), getHeight());
+		BufferedImage screenshot = getGraphicsConfiguration().createCompatibleImage(
+				(int)(identityTx.getScaleX() * getWidth()), (int)(identityTx.getScaleY() * getHeight()));
 
+		Graphics2D g = (Graphics2D) screenshot.getGraphics();
+		g.setTransform(identityTx);
 		if (windowManager.getLastSnapshot() == null) {
-			paintRobocodeLogo((Graphics2D) screenshot.getGraphics());		
+			paintRobocodeLogo(g);
 		} else {
-			drawBattle((Graphics2D) screenshot.getGraphics(), windowManager.getLastSnapshot());
+			drawBattle(g, windowManager.getLastSnapshot());
 		}
 		return screenshot;
 	}
@@ -282,7 +288,7 @@ public class BattleView extends Canvas {
 		graphicsState.save(g);
 
 		// Reset transform
-		g.setTransform(new AffineTransform());
+		g.setTransform(identityTx);
 
 		// Reset clip
 		g.setClip(null);
@@ -296,8 +302,8 @@ public class BattleView extends Canvas {
 		double dy = (getHeight() - scale * battleField.getHeight()) / 2;
 
 		// Scale and translate the graphics
-		AffineTransform at = AffineTransform.getTranslateInstance(dx, dy);
-
+		AffineTransform at = new AffineTransform(identityTx);
+		at.concatenate(AffineTransform.getTranslateInstance(dx, dy));
 		at.concatenate(AffineTransform.getScaleInstance(scale, scale));
 		g.setTransform(at);
 
@@ -349,7 +355,7 @@ public class BattleView extends Canvas {
 
 				final AffineTransform savedTx = g.getTransform();
 
-				g.setTransform(new AffineTransform());
+				g.setTransform(identityTx);
 				g.drawImage(groundImage, dx, dy, groundWidth, groundHeight, null);
 
 				g.setTransform(savedTx);
@@ -649,14 +655,15 @@ public class BattleView extends Canvas {
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+		AffineTransform savedTx = g.getTransform();
 		g.transform(AffineTransform.getTranslateInstance((getWidth() - 320) / 2.0, (getHeight() - 46) / 2.0));
 		g.setColor(new Color(0, 0x40, 0));
 		g.fill(robocodeTextPath);
+		g.setTransform(savedTx);
 
 		Font font = new Font("Dialog", Font.BOLD, 14);
 		int width = g.getFontMetrics(font).stringWidth(ROBOCODE_SLOGAN);
 
-		g.setTransform(new AffineTransform());
 		g.setFont(font);
 		g.setColor(new Color(0, 0x50, 0));
 		g.drawString(ROBOCODE_SLOGAN, (float) ((getWidth() - width) / 2.0), (float) (getHeight() / 2.0 + 50));
