@@ -10,6 +10,7 @@ package net.sf.robocode.host.security;
 
 import net.sf.robocode.host.IHostedThread;
 import net.sf.robocode.host.IThreadManager;
+import net.sf.robocode.io.RobocodeProperties;
 
 import java.net.SocketPermission;
 import java.security.AccessControlException;
