@@ -1,5 +1,16 @@
 # Robocode
 
+# Notes for RLAI Build
+* Install JDK 11
+* Set run configurations to use JDK 11
+* Set File -> Project Structure... to use JDK 11
+* Reload all Gradle projects from the tool window
+* Build with JDK 11:
+   ```shell
+   export JAVA_HOME=`/usr/libexec/java_home -v 11`
+   ./gradlew build
+   ```
+
 **_Build the best — destroy the rest!_**
 
 Robocode is a programming game, where the goal is to develop a robot battle tank to battle against other tanks in Java.
