@@ -36,3 +36,5 @@ if [ "$JAVA_MAJOR_VERSION" -gt 11 ]
 then
   export _JAVA_OPTIONS="-Djava.security.manager=allow"
 fi
+
+export _JAVA_OPTIONS="${_JAVA_OPTIONS}-DALLOWLOCALHOST=true -Ddebug=true"

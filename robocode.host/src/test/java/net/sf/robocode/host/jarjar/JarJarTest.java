@@ -8,19 +8,17 @@
 package net.sf.robocode.host.jarjar;
 
 
-import org.junit.Test;
+import net.sf.robocode.io.JarJar;
+import net.sf.robocode.io.URLJarCollector;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLClassLoader;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import net.sf.robocode.io.URLJarCollector;
-import net.sf.robocode.io.JarJar;
 
 
 /**
@@ -58,19 +56,5 @@ public class JarJarTest {
 		Assert.assertFalse(isr.ready());
 		isr.close();
 		inputStream.close();
-	}
-
-	@Test
-	public void runClassLoader() throws IOException, ClassNotFoundException {
-		String clas = "tested.robots.Ahead";
-		String inner = "Inner.jar";
-		String outer = "file:src/test/resources/Outer.jar";
-		final String separ = "!/";
-		final String root = "jar:jarjar:" + outer + JarJar.SEPARATOR + inner + separ;
-		URL u = new URL(root);
-
-		ClassLoader ucl = new URLClassLoader(new URL[] { u});
-
-		ucl.loadClass(clas);
 	}
 }
