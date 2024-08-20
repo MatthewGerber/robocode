@@ -1,6 +1,13 @@
 # Robocode
 
 # Notes for RLAI Build
+
+* Add -DALLOWLOCALHOST=true -Ddebug=true:
+* robocode.bat or set_java_options.bat
+* robocode.sh or set_java_options.sh
+* .idea/runConfigurations/Robocode_app.xml
+* Might also need -Djava.security.manager=allow
+
 * Install JDK 11
 * Set run configurations to use JDK 11
 * Set File -> Project Structure... to use JDK 11
